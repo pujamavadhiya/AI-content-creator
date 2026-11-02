@@ -42,6 +42,9 @@ class QdrantVectorStore:
         if not points:
             return
 
+        if points and "vector" in points[0] and isinstance(points[0]["vector"], list):
+            vector_size = len(points[0]["vector"])
+
         self.ensure_collection(vector_size=vector_size)
         
         qdrant_points = [
