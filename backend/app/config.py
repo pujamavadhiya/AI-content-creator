@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import field_validator
 from typing import Optional
 from pathlib import Path
 import os
@@ -49,10 +50,22 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "./uploads"
     EXPORT_DIR: str = "./exports"
     MAX_UPLOAD_SIZE_MB: int = 25
+
+    @field_validator("GEMINI_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "QDRANT_API_KEY", mode="before")
+    @classmethod
+    def clean_empty_strings(cls, v):
+        if isinstance(v, str):
+            v = v.strip()
+            return v if v else None
+        return v
     
-    # Model config
+    # Model config - checks root .env, backend/.env, or cwd .env
     model_config = SettingsConfigDict(
-        env_file=os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env"),
+        env_file=(
+            os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env"),
+            os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env"),
+            ".env",
+        ),
         env_file_encoding="utf-8",
         extra="ignore"
     )
@@ -62,3 +75,4 @@ settings = Settings()
 # Ensure required local directories exist
 for folder in ["./data", settings.UPLOAD_DIR, settings.EXPORT_DIR]:
     Path(folder).mkdir(parents=True, exist_ok=True)
+
