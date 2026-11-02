@@ -1,0 +1,58 @@
+@use 'variables' as *;
+
+@mixin flex($justify: flex-start, $align: stretch, $direction: row) {
+  display: flex;
+  justify-content: $justify;
+  align-items: $align;
+  flex-direction: $direction;
+}
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin card {
+  background: $bg-surface;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  box-shadow: $shadow-sm;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding: 8px 16px;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  border: 1px solid transparent;
+  outline: none;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+@mixin responsive($breakpoint) {
+  @if $breakpoint == sm {
+    @media (max-width: 640px) { @content; }
+  } @else if $breakpoint == md {
+    @media (max-width: 768px) { @content; }
+  } @else if $breakpoint == lg {
+    @media (max-width: 1024px) { @content; }
+  } @else if $breakpoint == xl {
+    @media (max-width: 1280px) { @content; }
+  }
+}
