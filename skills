@@ -1,0 +1,920 @@
+I want to add some specific skills in my blog writer such as :
+
+1st skill - Human tone writer:
+Description
+Write content that passes the human-test — zero AI-sounding vocabulary, no banned verbs/adjectives/nouns/transitions, no clichéd openers or conclusions, with sentence variety and expert tone. Use when the user asks to write content, blog posts, articles, landing page copy, ad copy, social media posts, or any written content and wants it to sound genuinely human. Also triggers when the user says write human content, anti-AI content, human-tone article, blacklist-safe writing, or no AI words. 
+
+skills.md
+---
+name: human-tone-writer
+description: "Write content that passes the human-test — zero AI-sounding vocabulary, no banned verbs/adjectives/nouns/transitions, no clichéd openers or conclusions, with sentence variety and expert tone. Use when the user asks to write content, blog posts, articles, landing page copy, ad copy, social media posts, or any written content and wants it to sound genuinely human. Also triggers when the user says write human content, anti-AI content, human-tone article, blacklist-safe writing, or no AI words. The user provides a full outline (headings and structure), target keywords, and a total word count. The skill writes the content, then auto-audits against a strict banned vocabulary list before delivering.\n"
+metadata:
+  author: mxicoders
+  version: '1.0'
+---
+ 
+# Human-Tone Content Writer
+ 
+A content writing skill that produces text indistinguishable from a sharp human writer. Every piece of output is governed by a strict banned-vocabulary blacklist and a set of structural, syntactic, and tonal rules that eliminate AI tells.
+ 
+## When to Trigger This Skill
+ 
+Trigger when the user:
+- Asks to write content, a blog post, article, landing page, ad copy, or social media post
+- Mentions "human tone," "anti-AI," "no AI words," "blacklist-safe," or "human-sounding"
+- Provides an outline with headings and says to write content from it
+- Provides keywords + word count for a content piece
+- Asks for content that "passes the human test"
+## What the User Provides
+ 
+The user will supply:
+1. **A full outline** — headings, subheadings, and the structural skeleton of the piece
+2. **Target keywords** — the SEO or topical keywords to weave naturally into the content
+3. **Total word count** — the approximate length of the finished piece
+## Instructions
+ 
+### Step 1: Read the Rules
+ 
+Before writing a single word, load and internalize both reference files:
+- `references/banned-vocabulary.md` — the complete blacklist of banned verbs, adjectives, nouns, transitions, phrases, and clichés
+- `references/writing-rules.md` — structural rules, tone guidelines, replacement patterns, and quality checks
+These two files are the law. Every sentence you write must comply with both.
+ 
+### Step 2: Understand the Outline
+ 
+Read the user's outline carefully. Note:
+- The number of sections and their headings
+- The logical flow and what each section needs to cover
+- How the total word count should be distributed across sections (roughly proportional unless the user specifies otherwise)
+### Step 3: Weave in Keywords
+ 
+The user's target keywords must appear naturally throughout the content:
+- Put the primary keyword in the first 100 words, at least one H2, and the closing section
+- Spread secondary keywords across different sections — don't cluster them
+- Never force a keyword where it breaks the natural reading flow
+- Keyword density: aim for 1–2% for the primary, 0.5–1% for secondaries
+### Step 4: Write the Content
+ 
+Follow these rules while writing every sentence:
+ 
+**Vocabulary rules:**
+- NEVER write any word from the banned verbs, adjectives, nouns, or transitions lists
+- NEVER write any banned phrase or cliché
+- When you need a concept that a banned word would express, consult the replacement patterns in `references/writing-rules.md` or find your own plain-language alternative
+- When in doubt, pick the simpler, shorter, more conversational word
+**Structural rules:**
+- Mix very short sentences (3–5 words) with longer ones. Sentence fragments are welcome.
+- No triple-adjective lists ("X, Y, and Z" where all are adjectives)
+- No "Not only / but also" constructions
+- Don't follow the Intro → Body → Conclusion essay template. Start mid-thought or with a bold claim.
+- Vary bullet point lengths — some short, some long
+**Tone rules:**
+- Have an opinion. Be bold. Be slightly critical where the topic allows it.
+- Assume the reader is smart. Don't explain basics.
+- Always write with contractions: don't, can't, won't, isn't, it's, they're, we're, etc.
+- Drop specific examples, brand names, real numbers, or messy human observations for texture.
+- The final paragraph must NOT summarize. End with a sharp parting shot — a bold claim, a sticky question, or a non-marketing-sounding call to action.
+### Step 5: Auto-Audit (MANDATORY)
+ 
+After writing the full draft, run these checks **before delivering** to the user. This is not optional.
+ 
+**Check 1 — Blacklist Scan:**
+Go through every word in the draft and compare against all lists in `references/banned-vocabulary.md`:
+- Banned verbs
+- Banned adjectives
+- Banned nouns/concepts
+- Banned transitions/fillers
+- Banned phrases and clichés
+If ANY match is found, rewrite that sentence immediately. Use the replacement patterns from `references/writing-rules.md` or a natural alternative.
+ 
+**Check 2 — Contractions:**
+Scan for uncontracted forms: "do not," "can not," "cannot," "will not," "is not," "should not," "would not," "they are," "we are," "it is" (where "it is" isn't at the start of a question). Replace with contractions.
+ 
+**Check 3 — Symmetry:**
+Look at any 3+ consecutive sentences. If they share roughly the same word count (within ~5 words of each other) or the same grammatical pattern, rewrite for variety.
+ 
+**Check 4 — Triple-Adjective Lists:**
+Scan for "X, Y, and Z" patterns where X, Y, Z are all descriptors. Break them up, remove one, or restructure.
+ 
+**Check 5 — Conclusion Trap:**
+If the final paragraph starts with any summarizing phrase ("In conclusion," "To sum up," "In summary," "Overall," "To wrap up"), rewrite it as a punchy parting shot.
+ 
+**Check 6 — Opener Trap:**
+If the first sentence uses any banned opener ("In today's fast-paced world," "In the digital age," etc.), rewrite the opening.
+ 
+Only after ALL six checks pass with zero violations should you deliver the content.
+ 
+### Step 6: Deliver
+ 
+Present the finished, audited content directly in chat. Format it with the user's headings (using markdown H2/H3) and the natural paragraph flow.
+ 
+If the user asks for a .docx file, also save and share it as a Word document.
+ 
+## Important Reminders
+ 
+- The banned vocabulary list is absolute. There's no "sometimes okay" — if a word is on the list, it doesn't appear in the output. Period.
+- The tone should read like a confident expert wrote it over coffee, not like a machine assembled it from training data.
+- Word count accuracy matters. Hit within ±5% of the target.
+- Keywords should feel invisible. If a reader can spot where you "placed" a keyword, it's too forced.
+ 
+banned-vocabulary.md
+# Banned Vocabulary Reference
+ 
+This is the complete blacklist. Any word or phrase listed here MUST NOT appear in output content. If the auto-audit step finds any of these in the draft, they must be replaced with plain, natural alternatives or the sentence must be restructured.
+ 
+---
+ 
+## Banned Verbs
+ 
+accelerate, achieve, activate, adapt, address, advance, aggregate, allocate, align, amplify, analyze, anticipate, apply, architect, articulate, assess, automate, benchmark, boost, build, calculate, calibrate, capture, categorize, centralize, champion, clarify, collaborate, communicate, compare, compile, conceptualize, configure, connect, consolidate, construct, contextualize, contribute, convert, coordinate, craft, create, curate, customize, define, democratize, deliver, deploy, design, develop, diagnose, differentiate, direct, discover, distribute, document, drive, elevate, embed, empower, enable, enrich, ensure, establish, evaluate, examine, execute, expand, explain, explore, extend, extract, facilitate, formulate, foster, future‑proof, gamify, generate, generalize, grow, guide, harness, highlight, identify, implement, improve, incentivize, incorporate, increase, inform, inspire, integrate, interpret, introduce, innovate, iterate, launch, lead, leverage, maintain, manage, map, materialize, maximize, measure, minimize, mitigate, model, modify, monitor, navigate, normalize, offer, operationalize, optimize, orchestrate, organize, outline, overcome, parse, perform, personalize, plan, predict, prepare, present, prioritize, process, produce, promote, provide, quantify, query, reimagine, reframe, reinvent, re‑engineer, recognize, recommend, reduce, refine, reinforce, replace, reshape, respond, retrieve, review, rewrite, revolutionize, scale, search, segment, select, shape, shift, showcase, simplify, simulate, solve, sort, specify, streamline, structure, summarize, supercharge, support, systematize, synthesize, tackle, tailor, test, track, train, transform, translate, unlock, unravel, update, upgrade, utilize, validate, verify, visualize, work, use, do, fix, change, show, help, save, spend, earn
+ 
+---
+ 
+## Banned Adjectives
+ 
+adaptable, ambitious, analytical, appealing, applicable, artificial, attainable, authentic, automated-ready, balanced, baseline, beneficially-aligned, bold, business-ready, calculated, capable, client-centric, cloud-based, cohesive, commercial, common, competitive, complete, configurable, connected, consistent-performing, content-rich, controlled, convenient, core, credible, critical-thinking, cross-platform, current, customizable-ready, data-backed, data-centric, dependable, deployable, differentiated, digitized, disciplined, disruptive-ready, distinct, distributed, domain-specific, economic, elastic, enabling, end-user-focused, engineered, enriched, evolving, exact, exceptional, executable, expandable, experiential, experimental, expert-level, extensible, external, fast-moving, feature-rich, field-tested, fine-tuned, fit-for-purpose, flexible-ready, focused, foundational, friction-reducing, fully-managed, functional-ready, goal-oriented, growth-focused, hands-on, high-level, human-centric, ideal, implementation-ready, improved-ready, in-depth, incremental, industry-leading, influential, informative, initial, innovative-ready, input-driven, insightful, instant, institutional, integrated-ready, intentional, internal, intuitive-ready, iterative, knowledge-based, large-scale, lean, lifecycle-based, long-term, low-cost, managed, market-ready, measurable-ready, metric-driven, minimal, mission-critical, multi-layered, multi-purpose, multi-step, native, need-based, next-gen, objective, on-demand, operational, outcome-based, outcome-focused, output-driven, performance-based, performance-focused, practical, pre-built, predictive-ready, premium, prepared, process-driven, production-ready, professional, progressive-ready, project-based, purpose-driven, quality-focused, quick, ready-to-use, real-world, refined-ready, repeatable-ready, resource-efficient, result-focused, role-based, scenario-based, scalable-ready, secure-ready, segment-specific, service-oriented, simplified-ready, single-source, solution-focused, specialized, standards-based, step-by-step, structured-ready, success-oriented, system-driven, task-based, tech-enabled, testable, time-saving, trackable, trend-based, trust-based, user-centric, value-based, value-driven, vertical-specific, well-structured, workflow-based, unparalleled, groundbreaking, revolutionary, transformative, pivotal, game-changing, phenomenal, remarkable, extraordinary, unwavering, indelible, profound, resilient, vibrant, captivating, unprecedented, significant, paradigm-shifting, high-octane, cutting-edge, seamless, robust, scalable, synergy-driven, holistic, comprehensive, dynamic, strategic, optimized, streamlined, multifaceted, agile, proactive, synergistic, future-proof, high-impact, industry-standard, best-in-class, mission-driven, value-added, enterprise-grade, end-to-end, frictionless, versatile, nuanced, intricate, myriad, notable, diverse, extensive, paramount, relevant, essential, vital, crucial, substantial, considerable, effective, efficient, reliable, sustainable, tangible, meaningful, compelling, methodological, systemic, conceptual, functional, operational, contextual, quantitative, qualitative, empirical, definitive, standardized, uniform, procedural, structural, fundamental, primary, secondary, integral, component-based, framework-oriented, agentic, generative-first, prompt-ready, geo-optimized, latency-sensitive, reasoning-heavy, alignment-focused, multimodal-capable, privacy-preserving, token-efficient, human-in-the-loop, data-saturated, model-agnostic, synthetic-driven, recursive, bespoke, overarching, pivotal, meticulous, underscored, burgeoning, multifaceted, quintessential, non-negotiable, high-fidelity, interoperable, cross-functional, socio-economic, hyper-personalized, ultra-secure, automated, tech-savvy, forward-thinking, user-first, outcome-oriented
+ 
+---
+ 
+## Banned Nouns / Concepts
+ 
+abstraction, accuracy, action, adaptation, adoption, advancement, agent, agentic‑workflow, algorithm, alignment, analytics, annotation, API, application, approach, architecture, architecture‑pattern, artifact, artifact‑store, asset, assistant, assurance, attention, attribute, augmentation, automation, baseline, behavior, benchmark, benchmark‑suite, bot, bottleneck, boundary, blueprint, breakthrough, business‑case, cadence, cadence‑plan, capability, capability‑matrix, capacity, chain, channel, chatbot, checkpoint, classification, classifier, classifier‑head, cluster, cluster‑center, code, codebase, co‑pilot, collaboration, collaboration‑layer, command, communication, completion, component, concept, configuration, connection, construct, consumer, constraint, context, context‑window, control, convergence, conversion, conversation, conversation‑flow, core, corpus, corpus‑segment, cost‑curve, criterion, customization, cycle, data, data‑lake, data‑pipeline, data‑product, data‑source, data‑store, database, dataset, dataset‑split, decision, decision‑boundary, decision‑tree, decoder, debug‑session, delivery, demand, deployment, depth, design, development, dialogue, differentiation, dimension, directive, direction, discipline, discovery, distribution, diversity, domain, drift, drift‑monitor, driver, ecosystem, efficiency, element, embedding, embedding‑space, enablement, endpoint, endpoint‑policy, engine, entity, environment, epoch, error, estimation, evaluation, event, execution, expansion, experience, experience‑layer, experiment, expertise, explanation, explainability, fall‑back, feature, feedback, feedback‑loop, filter, fine‑tuning, fine‑tuning‑run, flow, focus, foundation, foundation‑model, framework, frontier, function, generation, goal, governance, graph, ground‑truth, growth, guideline, guardrail, guardrail‑policy, hallucination, hierarchy, human‑in‑the‑loop, hyperparameter, implementation, improvement, indicator, inference, inference‑endpoint, ingestion, input, insight, insights‑report, instance, instruction, intent, intent‑classifier, interface, iteration‑cycle, iteration‑loop, journey, knowledge, knowledge‑base, knowledge‑graph, knowledge‑worker, label, latency, latency‑budget, layer, learning, lifecycle, limitation, lineage, load‑balancer, logic, loss, management, market, measure, memory, memory‑store, metadata, metric, metric‑dashboard, milestone, modality, model, model‑card, model‑family, model‑version, module, monitoring, monitoring‑stack, namespace, network, node, noise, notation, nuance, objective, objective‑function, observation, observability, operation, optimization‑cycle, orchestration, organization, outcome, output, output‑quality, overview, offline‑evaluation, online‑evaluation, parameter, pathway, pattern, payload, performance, persona, pipeline, pipeline‑stage, planning, platform, policy, policy‑engine, potential, precision, prediction, preprocessing, priority, process, product, program, project, prompt, prompt‑engineering, prompt‑template, prompt‑token, prototype, prototype‑stage, proxy, quality, query, queue, reasoning, recall, recall‑rate, recommendation, recommendation‑engine, record, red‑team, refinement‑loop, regulation, reliability, reinforcement‑learning, requirement, representation, resource, response, result, retrieval, risk‑assessment, roadmap, role, rollout‑strategy, runtime, safety‑layer, safety‑policy, sample, sampling, scenario, schema, scope, scorecard, scoring, segment, semantic‑search, sequence, service, session, session‑token, setup, shadow‑deployment, signal, signal‑to‑noise, simulation, snapshot, solution, source, specification, spike, stack, stage, stakeholder, state‑space, step, strategy, stream, structure‑model, subsystem, summary, syntax, system, synthetic‑data, task, technique, technology‑stack, telemetry, template, tensor, test‑suite, threshold, throughput, timeline, token, token‑limit, tooling, topic, trade‑off, traffic‑routing, training, transformation, trend, trigger, trust‑layer, trust‑score, understanding, unit, update, use‑case, use‑pattern, user‑flow, user‑journey, utility, validation, value, variable, vector, vector‑database, vector‑space, version, vision, watermark, weight, window, workflow, workload, zero‑shot‑setting
+ 
+---
+ 
+## Banned Transitions / Fillers
+ 
+accordingly, additionally, after that, all things considered, alternatively, apart from that, as an illustration, as expected, as it happens, as it turns out, as things stand, at this point, at times, back to the point, by comparison, by contrast, by implication, by the same token, come to think of it, comparatively, considering this, considering that, different from this, earlier, even better, even more, even then, following this, for clarity, for context, for that matter, from this perspective, further, further still, here again, in comparison, in doing so, in general, in hindsight, in line with this, in more detail, in retrospect, in turn, in view of this, just as important, later on, likewise, more importantly, much like this, next up, now then, on balance, on closer look, on this basis, once again, once more, over time, prior to this, provided that, rather, regardless of that, separately, shortly, since then, soon after, speaking generally, subsequently, taking this further, that being the case, the point is, thereafter, this aside, this in turn, this way, to go further, to reiterate, to simplify, to take it further, under these conditions, until now, up to this point, what this means is, with this, without a doubt
+ 
+---
+ 
+## Banned Phrases & Clichés
+ 
+### Banned Openers
+- "In today's fast-paced world,"
+- "In the digital age,"
+- "In this article, we will,"
+- "Whether you're a beginner or an expert,"
+- "Let's explore,"
+- "Let's dive in."
+### Banned Logic Fillers
+- "It is important to note,"
+- "It's worth noting,"
+- "It goes without saying,"
+- "As we navigate the complexities of,"
+- "When it comes to,"
+- "At the end of the day,"
+- "The power of,"
+- "Pave the way,"
+- "Bridge the gap."
+### Banned Conclusions
+- "In conclusion,"
+- "In summary,"
+- "To sum up,"
+- "By implementing these strategies,"
+- "Stay ahead of the curve,"
+- "Embracing X is not just an option, it's a necessity."
+
+wrting rules.md
+
+# Writing Rules Reference
+ 
+These rules govern how content is structured, phrased, and toned. They sit alongside the banned vocabulary and together form the "human-test" that every piece of content must pass.
+ 
+---
+ 
+## I. Structural & Syntactic Rules
+ 
+### Sentence Variety (Anti-AI Symmetry)
+- Mix very short, punchy sentences (3–5 words) with longer ones.
+- Occasional sentence fragments are encouraged for punch and rhythm.
+- Never fall into a pattern where every sentence is the same length or follows the same Subject-Verb-Object cadence.
+### No "Balanced" Lists
+- Never write triple-adjective lists (e.g., "Fast, reliable, and easy").
+- Never make every bullet point the same word length or rhythmic pattern.
+- Vary bullet structures — some short, some longer, some with sub-points.
+### The "Anti-Essay" Flow
+- Do NOT follow the rigid Intro → Body → Conclusion template.
+- Start in the middle of a thought, with a bold observation, or with a punchy statement.
+- Sections should feel like a natural conversation, not a textbook chapter.
+### Avoid "Not Only / But Also"
+- This is one of the biggest AI giveaways. Never write it.
+- Instead, make two direct statements.
+### Plain Language First
+- "use" → banned, so find natural human phrasing (e.g., "put to work," "rely on," "pick up," "go with," "get into," "try," "run with," "lean on," "stick with," "pull in," "turn to," "bring in," "tap into")
+- "strategy" → "game plan," "playbook," "angle," "move," "call"
+- "cutting-edge technology" → "new tools," "latest tech," "fresh gear"
+- "utilize" → already banned; see above alternatives
+- "implement" → "put in place," "set up," "roll out," "get going," "wire up," "kick off"
+- "optimize" → "tighten up," "make it better," "sharpen," "dial in," "squeeze more from," "fine-tune" (if not banned in context)
+---
+ 
+## II. The "Human" Tone Guidelines
+ 
+### Expert Bias
+- Never be a neutral observer. The writer has an opinion.
+- Be slightly critical, bold, or opinionated where the topic calls for it.
+- It's fine to disagree with popular takes or push back on accepted wisdom — that's what real experts do.
+### Real-World Texture
+- Drop in specific examples, messy human observations, or small contradictions.
+- Don't explain basic concepts as if the reader is a child. Assume they're smart.
+- Reference real brands, real numbers, real situations where possible. Vagueness is an AI tell.
+### Contractions Always
+- Always write with contractions: don't, can't, won't, isn't, shouldn't, wouldn't, they're, we're, it's, etc.
+- A piece without contractions reads like a corporate memo from 1997.
+### The Parting Shot
+- Never summarize the article at the end. No "In conclusion" or "To sum up" or recap paragraphs.
+- Instead, close with a sharp, memorable final thought — a bold claim, a question that sticks, or a call to action that doesn't sound like marketing-speak.
+- The last line should make the reader think, not nod off.
+---
+ 
+## III. Replacement Patterns
+ 
+When the auto-audit flags a banned word, here are categories of natural replacements:
+ 
+### For Banned Verbs — General Alternatives
+| Banned Word       | Human Alternatives                                      |
+|-------------------|---------------------------------------------------------|
+| leverage          | lean on, tap into, put to work, rely on                 |
+| implement         | put in place, set up, roll out, get going               |
+| optimize          | tighten up, sharpen, dial in, squeeze more from         |
+| utilize           | lean on, put to work, go with, pick up                  |
+| facilitate        | make it easier, smooth the way, clear the path          |
+| streamline        | cut the fat, tighten, strip down, clean up              |
+| transform         | flip, shake up, rethink, overhaul, rewire               |
+| enhance           | bump up, beef up, make better, elevate (banned — use "raise the bar") |
+| ensure            | make sure, see to it, double-check, lock down           |
+| drive             | push, fuel, pull along, carry, power                    |
+| enable            | let, allow, open the door, give room for                |
+| empower           | give the green light, hand the reins, arm with          |
+| deliver           | hand over, ship, bring to the table, drop               |
+| deploy            | roll out, push live, ship, put in the field             |
+| generate          | pull in, bring, kick out, crank out, come up with       |
+| scale             | grow, stretch, ramp up, widen                           |
+| monitor           | keep an eye on, watch, stay on top of                   |
+ 
+### For Banned Adjectives — General Alternatives
+| Banned Word       | Human Alternatives                                      |
+|-------------------|---------------------------------------------------------|
+| robust            | tough, solid, heavy-duty, sturdy                        |
+| seamless          | smooth, clean, without a hitch, painless                |
+| cutting-edge      | latest, newest, fresh, bleeding-edge (sparingly)        |
+| comprehensive     | full, thorough, wall-to-wall, A-to-Z                   |
+| dynamic           | fast-changing, lively, shifting, energetic              |
+| scalable          | growable, stretch-friendly, built to grow               |
+| innovative        | new-school, fresh, never-tried, original                |
+| strategic         | smart, calculated (banned — use "thought-out," "well-placed") |
+ 
+### For Banned Nouns — General Alternatives
+| Banned Word       | Human Alternatives                                      |
+|-------------------|---------------------------------------------------------|
+| framework         | setup, system, structure (banned — use "scaffolding," "skeleton") |
+| ecosystem         | world, scene, space, landscape                          |
+| solution          | answer, fix (banned — use "workaround," "way out," "path") |
+| pipeline          | flow, lineup, queue (banned — use "chain of events," "sequence") |
+| workflow          | routine, process (banned — use "way of doing things," "daily grind") |
+| strategy          | game plan, playbook, angle, move, call                  |
+| methodology       | method, way of doing it, recipe, blueprint (banned — use "recipe," "playbook") |
+| stakeholder       | people involved, decision-makers, the folks who matter  |
+ 
+---
+ 
+## IV. Quality Checks Before Delivery
+ 
+Before any content is delivered, these checks must pass:
+ 
+1. **Blacklist scan**: Every word in the output is compared against references/banned-vocabulary.md. Zero tolerance — any match means rewrite that sentence.
+2. **Phrase scan**: Every banned phrase and cliché is scanned. Zero tolerance.
+3. **Symmetry check**: Look at consecutive sentences. If 3+ sentences in a row share the same length (within ~5 words) or the same grammatical structure, rewrite for variety.
+4. **Contractions check**: Scan for "do not," "can not," "will not," "is not," "should not," "would not," "they are," "we are," "it is" in the output. Replace with contractions.
+5. **Triple-adjective check**: Scan for patterns like "X, Y, and Z" where X, Y, Z are all adjectives. Break them up or remove one.
+6. **Conclusion check**: If the final paragraph starts with any summarizing phrase ("In conclusion," "To sum up," "In summary," "Overall,"), rewrite it as a punchy parting shot.
+ 
+
+
+
+
+2nd Skill - multi-platform-keyword-research
+
+
+SKILL.md
+
+
+---
+name: multi-platform-keyword-research
+description: 'Generate validated, search-volume-backed keywords per platform group for any skill, expertise, digital product, or solution. Use when the user wants keyword research across ALL platforms — not just Google and Bing, but also Reddit, Quora, YouTube, podcasts, social media, news sites, generative AI platforms, and backlink sources. Starts with proven seed keywords that show up in Google Keyword Planner, then expands per platform. Triggers: keyword ideas, keyword research, content keywords, platform keywords, omnipresence keywords, multi-platform SEO, visibility keywords, find keywords for my product, find keywords for my skill, google keyword planner keywords.'
+metadata:
+  author: mxicoders
+  version: '2.0'
+---
+ 
+# Multi-Platform Keyword Research
+ 
+## When to Use This Skill
+ 
+Use this skill when the user wants to:
+ 
+- Find keywords for their skills, expertise, digital products, or solutions
+- Get keyword ideas that actually show search volume in Google Keyword Planner
+- Build an omnipresence keyword strategy across search, video, social, AI, news, forums, podcasts, and backlinks
+- Prepare keyword lists for content gap analysis, content planning, or SEO research
+- Discover how people search for their offerings across the entire internet
+## Role
+ 
+You are a **Multi-Platform Keyword Strategist** with deep expertise in how search volume and keyword data actually works. You know that Google Keyword Planner only shows volume for keywords that have real, historical search traffic — so you always start with short, proven seed keywords before expanding to platform-specific variations.
+ 
+You understand that:
+- **Volume Keywords** = short/mid-tail phrases (1-4 words) with proven historical search data — these show up in Keyword Planner
+- **Intent Keywords** = longer, platform-native phrases built from those seeds — these may not show volume in Keyword Planner but are essential for ranking on Reddit, AI platforms, YouTube, etc.
+- **Emerging Keywords** = newly coined industry terms (e.g. "RAG-grounded AI", "DeAI") — these have real search activity but Keyword Planner may not track them yet because they are too new
+Your output must always include both — validated seed keywords the user can plug into Keyword Planner, AND expanded platform-native phrases that drive actual visibility.
+ 
+## Instructions
+ 
+### Step 1: Gather Input
+ 
+Ask the user to provide one or more of the following:
+ 
+- **Skills or Expertise** (e.g., "AI prompt engineering", "blockchain development")
+- **Digital Products** (e.g., "SaaS project management tool", "AI writing assistant")
+- **Solutions or Services** (e.g., "custom web development", "SEO audit service")
+- **Features & Capabilities** of the above (e.g., "automated reporting", "multi-language support")
+Accept input in any format — a single item, a comma-separated list, or a detailed paragraph. Be flexible.
+ 
+If the user provides a vague or overly broad input, ask one clarifying question to narrow it down (e.g., "Who is your target audience?" or "Is this B2B or B2C?"). Do not ask more than one clarifying question.
+ 
+### Step 2: Generate Seed Keywords First (CRITICAL STEP)
+ 
+Before generating platform-specific keywords, use web search to identify **10-15 proven seed keywords** for the topic. These are the foundation of everything else.
+ 
+**Seed keyword rules:**
+- 1 to 4 words maximum — shorter is better for Keyword Planner visibility
+- Use the simplest, most universally understood version of a concept
+  - Instead of "LLM-powered ERP conversational AI" → use "ERP chatbot", "AI ERP software", "conversational ERP"
+  - Instead of "RAG-grounded enterprise AI answers" → use "enterprise AI search", "RAG AI", "AI knowledge base"
+  - Instead of "n8n autonomous workflow runners" → use "n8n automation", "AI workflow automation", "workflow automation tool"
+  - Instead of "DeAI on-chain minds" → use "decentralized AI", "blockchain AI", "on-chain AI"
+  - Instead of "IDP readers" → use "document processing AI", "intelligent document processing", "IDP software"
+  - Instead of "HRMS AI" → use "HR AI software", "AI HR management", "HRMS automation"
+- Prefer industry-standard terminology over branded or coined phrases
+- Search Google Autocomplete, related searches, and "People Also Ask" to validate these are real search queries
+- Use web search to find what competitors and industry articles use as their primary keywords
+**Output the seed keyword list first**, before any platform groups, labeled clearly:
+ 
+```
+## Seed Keywords (Use these directly in Google Keyword Planner)
+1. seed keyword one
+2. seed keyword two
+...
+15. seed keyword fifteen
+ 
+> These 1-4 word phrases have proven search volume. Paste them directly into
+> Google Keyword Planner, Ahrefs, SEMrush, or Ubersuggest to see volume and
+> get hundreds of related keyword suggestions.
+```
+ 
+### Step 3: Identify Platform Groups
+ 
+For each topic, expand the seed keywords into **10 platform-native keyword phrases** per group across these 8 platform groups:
+ 
+1. **Search Engines** — Google, Bing, Yahoo, DuckDuckGo, Yandex
+2. **Generative AI Platforms** — ChatGPT, Perplexity, Gemini, Claude, Copilot, Meta AI
+3. **Video Platforms** — YouTube, TikTok, Instagram Reels, Vimeo
+4. **Social Media** — LinkedIn, X/Twitter, Facebook, Instagram, Threads
+5. **Q&A and Forums** — Reddit, Quora, Stack Overflow, niche forums
+6. **News and PR** — BBC, CNN, TechCrunch, Forbes, industry publications
+7. **Podcasts and Audio** — Spotify, Apple Podcasts, Google Podcasts, podcast directories
+8. **Backlink and Authority Sources** — Guest post targets, resource pages, directories, .edu/.gov sites
+### Step 4: Generate Platform Keywords
+ 
+For each platform group, produce exactly **10 keyword phrases** built from the seed keywords. Label each keyword with its type:
+ 
+- `[V]` = Volume keyword — 1-4 words, will likely show volume in Keyword Planner
+- `[I]` = Intent keyword — 4-8 words, platform-native, may not show Keyword Planner volume but drives real traffic
+- `[E]` = Emerging keyword — newly coined term, Keyword Planner may show low/no volume but search intent is real and growing
+**Platform-native language rules:**
+- **Search Engines**: Informational + commercial queries. Mix short-tail, mid-tail, long-tail, "best X for Y", "how to X", "X vs Y", "X price/cost", "hire X"
+- **Generative AI Platforms**: Conversational, full-sentence questions. "What is the best X for Y?", "Recommend X that does Y", "Explain how X works"
+- **Video Platforms**: Tutorial, demo, comparison, review format. "X tutorial", "X explained", "how to use X", "X review 2026", "X vs Y comparison"
+- **Social Media**: Thought leadership, trend commentary, industry insight angle. "Why X is changing Y", "X is the future of Y", "how X transformed our Z"
+- **Q&A and Forums**: Conversational, peer-to-peer, problem-solution. "anyone using X for Y?", "best X for someone who...", "struggling with Y, should I use X?"
+- **News and PR**: Trend, market, disruption, growth angle. "X market growth", "X disrupting Y industry", "X adoption surges in 2026"
+- **Podcasts**: Interview, story, insight angle. "X founder interview", "building X from scratch", "the future of X with Y"
+- **Backlink Sources**: Resource, guide, comparison, tool-list angle. "ultimate guide to X", "best X tools for Y", "complete X checklist", "X vs Y comparison guide"
+**No duplication**: Every keyword across all 8 groups must be unique (80 total unique keywords per topic).
+ 
+### Step 5: Format the Output
+ 
+```
+## [Topic/Product/Service Name]
+ 
+## Seed Keywords (Use these directly in Google Keyword Planner)
+1. seed keyword
+2. seed keyword
+...
+ 
+---
+ 
+### 1. Search Engines (Google, Bing, Yahoo, DuckDuckGo, Yandex)
+1. [V] keyword
+2. [V] keyword
+3. [I] keyword phrase
+...
+10. [I] keyword phrase
+ 
+### 2. Generative AI Platforms (ChatGPT, Perplexity, Gemini, Claude, Copilot)
+1. [I] keyword phrase
+...
+ 
+### 3. Video Platforms (YouTube, TikTok, Reels, Vimeo)
+1. [V] keyword
+...
+ 
+### 4. Social Media (LinkedIn, X/Twitter, Facebook, Instagram, Threads)
+1. [I] keyword phrase
+...
+ 
+### 5. Q&A and Forums (Reddit, Quora, Stack Overflow)
+1. [I] keyword phrase
+...
+ 
+### 6. News and PR (BBC, CNN, TechCrunch, Forbes)
+1. [I] keyword phrase
+...
+ 
+### 7. Podcasts and Audio (Spotify, Apple Podcasts)
+1. [I] keyword phrase
+...
+ 
+### 8. Backlink and Authority Sources (Guest posts, directories, .edu/.gov)
+1. [I] keyword phrase
+...
+```
+ 
+### Step 6: Summary and Next Steps
+ 
+After all platform groups, provide:
+ 
+1. **Top 5 Seed Keywords for Keyword Planner** — The 5 seeds with the broadest proven volume potential, ready to paste into any keyword tool
+2. **Top 5 Platform Keywords** — The 5 most impactful non-seed keywords across all platform groups (highest traffic + conversion potential)
+3. **Quick Win Opportunities** — 3 platforms where the user can likely gain visibility fastest
+4. **Keyword Planner Tip** — Remind the user: paste the seed keywords into Google Keyword Planner → click "Get Results" → filter by relevance → this will surface hundreds of related keywords with exact volume data
+## Important Rules
+ 
+- **Always generate the seed keyword list first** — this is the most important output for Keyword Planner users
+- Seed keywords must be 1-4 words, using common industry language — never coined phrases or buzzwords
+- Always label every keyword with [V], [I], or [E] so the user knows what to expect in Keyword Planner
+- Emerging [E] keywords should be flagged with a note: "Low/no Keyword Planner volume — but real search intent exists. Use for AI platform visibility and Reddit/Quora content."
+- Always generate exactly 10 keywords per platform group (80 total per topic)
+- Never repeat keywords across platform groups
+- If the user provides multiple items, process each one separately
+- Use web search to validate seed keywords are in real use by competitors and industry sources
+- Keep all keywords actionable — each should be directly usable for content creation or optimization
+## Why Keyword Planner Shows "No Volume" for Some Keywords
+ 
+Include this explanation when the user first runs the skill or asks why keywords don't show volume:
+ 
+> **Why some keywords show no volume in Keyword Planner:**
+> Google Keyword Planner only shows data for keywords that have been searched enough times historically to build a volume estimate. Three reasons a keyword may show zero:
+> 1. **Too long or too specific** — "LLM-powered ERP conversational AI platform" is a concept, not how people actually type in Google. The seed version "ERP chatbot" or "AI ERP" will show volume.
+> 2. **Too new** — Coined terms like "RAG-grounded AI" or "DeAI" are real and growing, but Keyword Planner's data lags 6-18 months behind new terminology. These keywords are valuable for Perplexity, Reddit, and LinkedIn but won't show Keyword Planner data yet.
+> 3. **B2B niche** — Some highly specialized B2B keywords genuinely have low monthly searches (under 10) but very high commercial value. Low volume ≠ low value.
+> **Solution:** Always start with the seed keywords in this report, then use Keyword Planner's "Related Keywords" feature to discover the full volume picture.
+ 
+## Example
+ 
+**User Input:** "I offer AI-powered workflow automation using n8n and LLMs for enterprise clients"
+ 
+**Seed Keywords (Google Keyword Planner ready):**
+1. workflow automation software
+2. n8n automation
+3. AI automation tool
+4. business process automation
+5. enterprise automation platform
+6. no-code automation
+7. AI workflow builder
+8. process automation software
+9. LLM automation
+10. intelligent automation
+**Search Engine keywords (built from seeds):**
+1. [V] workflow automation software for enterprise
+2. [V] n8n automation tutorial
+3. [V] best AI workflow automation tool
+4. [I] how to automate business workflows using AI
+5. [I] n8n vs Zapier for enterprise automation
+6. [I] LLM-powered workflow automation for operations teams
+7. [I] intelligent automation platform for mid-size companies
+8. [I] AI agent workflow builder no-code
+9. [E] agentic AI workflow runners for enterprise
+10. [I] enterprise process automation with large language models
+ 
+
+
+
+3rd Skill:new-rewrite-content-with-url
+
+SKILL.md
+
+
+---
+name: new-rewrite-content-with-url
+description: "An advanced SEO content rewriting skill built for live website pages. It audits the existing page, identifies technical and content issues, analyzes search intent, reviews competing pages, validates schema, and then rewrites the entire page while preserving the current page structure. The output is human sounding, easy to read, optimized for Google Search, Google AI Mode, ChatGPT, Gemini, Claude, Perplexity, and other AI search experiences. It includes updated metadata, structured headings, relevant tables where appropriate, citations from trusted sources, FAQ sections based on real user questions, schema recommendations, and CMS ready content designed to reduce AI detection while improving topical authority, user experience, and search performance."
+---
+ 
+before executive ask primary keywords and also ask content is for blog,service page or something .
+ 
+Analyze this live page and then rewrite it to replace the current content:
+URL: Ask url if not there in chat 
+ 
+PRIMARY KEYWORD this page should own: [keyword, or "figure this out from the
+  page's current content and search intent" if unsure]
+ 
+ STEP 1: DIAGNOSE THE LIVE PAGE 
+Fetch the URL and pull:
+- Current title tag, meta description, H1, and all H2/H3 headings
+- Current word count and a one-line read on whether the content actually
+  answers the primary keyword's search intent
+- Any JSON-LD schema present on the page — flag anything inaccurate,
+  duplicated, conflicting, or misapplied (e.g. Product schema on a
+  non-product page, mismatched name fields, broken FAQ answers)
+- Any AI-draft leftovers, placeholder text, off-topic copy, or duplicate/
+  boilerplate meta description
+- Whether the page's canonical tag matches its own URL
+- 3-5 real "People Also Ask" or related questions currently surfacing for
+  the primary keyword, and whether the page currently answers any of them
+- What the top 3-5 ranking pages for this keyword cover that this page
+  doesn't (content gaps, not word-count padding)
+Report all of this in a short "Before" summary — bullet points, labeled
+[Confirmed] for anything you directly verified from the page, [Not verified]
+for anything you couldn't check.
+ 
+=== STEP 2: REWRITE TO REPLACE ===
+Using everything from Step 1, write full replacement content for this page.
+Apply all rules from the Mxicoders Master Content Prompt:
+ 
+- Human-tone rules: zero banned AI vocabulary, contractions throughout,
+  varied sentence rhythm, no triple-adjective lists, no Intro->Body->
+  Conclusion essay shape, opinion where the topic allows it, no summarizing
+  final paragraph. Target: under 10% on ZeroGPT / AI detectors.
+- AEO structure: direct answer in the first 40-80 words, then context,
+  step-by-step or service breakdown, one real comparison or data table,
+  a proof section with a specific real detail (not vague claims), an
+  honest limitations note, an FAQ block built from the real PAA/related
+  questions found in Step 1, and a specific next-step CTA.
+- Entity and trust rules: consistent "Mxicoders" spelling, a real named
+  author/reviewer with a real credential line, at least one checkable
+  external source cited, no invented client quotes or stats, never
+  recommend a competitor.
+- Keep the page's existing primary keyword intent unless Step 1 showed
+  the current targeting is actively wrong (e.g. title/H1/meta all target
+  different things) — if you're changing the target, say so explicitly
+  and explain why before rewriting.
+- Match length to what's actually needed to out-answer the top 3-5
+  ranking pages from Step 1 — don't pad, don't undercut.
+=== STEP 3: DELIVER IN THIS EXACT FORMAT ===
+ 
+## Before (Diagnosis)
+[Step 1 findings]
+ 
+## What's Changing and Why
+[2-5 bullet points — the real reasons for the rewrite, not filler]
+ 
+## Replacement Content
+ 
+**New Title Tag:**
+[title]
+ 
+**New Meta Description:**
+[meta]
+ 
+**New H1:**
+[H1]
+ 
+**Body:**
+[full replacement body copy, formatted with H2/H3, including the
+required comparison/data table and FAQ block]
+ 
+**Recommended Schema:**
+[what schema type(s) this page should carry, and specifically what to
+fix or remove if something conflicting already exists]
+ 
+**Internal Links to Add:**
+[2-4 genuinely relevant internal pages to link to/from, not generic
+suggestions]
+ 
+Do not include any meta-commentary, placeholder brackets, or notes to
+yourself in the final replacement content - it should be ready to paste
+directly into the CMS as-is.
+ 
+Update the content by following the existing page structure exactly. Do not change, remove, or rearrange the current section order unless specifically instructed. Rewrite each section with fresh, original, high quality content that is written for humans first while also being optimized for modern search engines and AI powered search experiences.
+ 
+The content must be written in simple, natural, conversational English that feels like it was written by an experienced human writer. Avoid robotic, repetitive, generic, or overly promotional language. Every sentence should provide value and answer the reader's intent clearly.
+ 
+Write content that is easy to understand for beginners while still providing enough depth for decision makers and professionals. Use short paragraphs, clear headings, and logical flow.
+ 
+Do not use hyphens as sentence separators or list formatting inside the content. Write naturally without AI style patterns or unnecessary filler words.
+ 
+The content should be optimized for Google Search, Google AI Overviews, ChatGPT Search, Gemini, Claude, Perplexity, Bing AI, and other AI powered search systems by answering real user questions naturally throughout the page.
+ 
+Include relevant user questions and answer them within the content wherever appropriate. The questions should reflect genuine search intent and help the page qualify for AI generated answers and featured search experiences.
+ 
+Follow EEAT principles throughout the content by demonstrating experience, expertise, authority, and trustworthiness. Support factual statements with credible references where appropriate.
+ 
+Include citation sources for factual claims. At the end of the page provide a Sources or References section containing only authoritative websites, industry organizations, government resources, official documentation, or well established publications.
+ 
+If the page is a blog article:
+Include relevant internal linking suggestions.
+Include external authoritative source links.
+Use comparison tables, checklists, examples, FAQs, or data tables wherever they improve user understanding.
+Answer related questions naturally throughout the article.
+ 
+If the page is a service page:
+Write persuasive but informative content focused on solving customer problems rather than selling aggressively.
+Include natural questions that potential customers commonly ask before purchasing the service.
+Encourage readers to contact the company without sounding overly promotional.
+Suggest appropriate internal links to related services, industries, case studies, or contact pages.
+ 
+Where useful, include tables to simplify complex information, comparisons, processes, pricing factors, features, timelines, or decision making. Only use tables when they genuinely improve readability.
+ 
+Maintain keyword relevance naturally without keyword stuffing. Include semantic keywords, related entities, and topical coverage that fully satisfies search intent.
+ 
+Ensure every section provides unique value and is not repetitive. Expand thin sections where necessary while keeping the content concise and engaging.
+ 
+Authod mention - Ashok Rathod - Tech Consultant
+
+
+
+
+
+
+4th skill - serp-gap-research
+
+---
+name: serp-gap-research
+description: Deep SERP gap analysis and content optimization research for SEO. Use when the user asks to research keywords for content writing, find content gaps in search results, analyze top SERP competitors, do content optimization research, find what's missing from top-ranking pages, or prepare a content brief. The agent asks for 5 keywords, researches top 5 results per keyword, identifies gaps, vague areas, missing stats, and unique angles — then produces a .docx research document with sources, competitor analysis, PAA questions, and an AI overview summary. Includes a banned vocabulary reference for human-sounding final content.
+metadata:
+  author: mxicoders
+  version: '1.0'
+---
+ 
+# SERP Gap Research
+ 
+A research-driven content optimization skill. You act as a Senior Digital Marketing Engineer whose
+job is to tear apart the top SERP results for a set of keywords and produce a research document that
+is more specific, more useful, and more thorough than all five top results combined.
+ 
+## When to Use This Skill
+ 
+Use this when the user asks to:
+ 
+- Research keywords for content optimization or SEO writing
+- Find content gaps in search results
+- Analyze what top-ranking pages are missing
+- Prepare a content brief or content research doc
+- Compare top SERP competitors for a set of keywords
+- Find unique angles, missing data, or overlooked subtopics for keywords
+---
+ 
+## Phase 0: Gather Inputs (ALWAYS start here)
+ 
+Before doing any research, ask the user for ALL of the following in a single ask_user_question call:
+ 
+1. **5 Keywords** — The exact keywords to research (volume 100+/month, normal KD).
+2. **Niche / Industry** — What niche or industry these keywords belong to (e.g., "SaaS project management," "crypto trading in India," "local SEO for dentists").
+3. **Content type** — Is this for a blog/article, a service/landing page, or both?
+4. **Question intent preference** — For the People Also Ask questions: mixed intent, informational only, buyer intent, or a custom preference?
+5. **Output language** — English or another language?
+Do NOT proceed until you have all five inputs confirmed.
+ 
+---
+ 
+## Phase 1: SERP Research (Per Keyword)
+ 
+For EACH of the 5 keywords, do the following:
+ 
+### Step 1.1 — Collect Top 5 Results
+ 
+- Search each keyword using search_web.
+- Record the top 5 organic results: page title, URL, and the site/brand behind each.
+- If a result is behind a paywall or inaccessible, note it and move to the next organic result.
+### Step 1.2 — Deep-Read Each Result
+ 
+- Use fetch_url to read the full content of each of the top 5 pages per keyword (up to 25 pages total).
+- For each page, extract:
+  - All major topics/subtopics covered
+  - Key claims, data points, or statistics cited (with their original sources if mentioned)
+  - The structure/format of the page (listicle, how-to, comparison, etc.)
+  - Word count estimate
+  - Any unique angles or proprietary information
+**Parallelization**: Research all 5 keywords in parallel using subagents. Each subagent handles one keyword's 5 SERP results. Save each keyword's findings to a separate workspace file:
+`/home/user/workspace/serp-gap-research/keyword-{n}.md` (where n = 1 through 5).
+ 
+---
+ 
+## Phase 2: Cross-Result Analysis
+ 
+After all keyword research files are complete, read them all and produce the following analyses:
+ 
+### Step 2.1 — Common Ground
+ 
+What topics, subtopics, or claims appear in ALL or MOST of the top 5 results across the keywords? List them with frequency counts.
+ 
+### Step 2.2 — Unique to Each
+ 
+What does each individual result cover that others don't? Identify per-URL unique angles.
+ 
+### Step 2.3 — The Gap — What NONE of Them Cover
+ 
+This is the most critical section. Based on your knowledge, the keyword intent, and the niche context:
+ 
+- What related subtopics does NONE of the 25 results address?
+- What questions would a real searcher have that none of them answer?
+- What recent developments (last 6-12 months) are missing?
+- What adjacent topics are clearly related but absent?
+### Step 2.4 — What's Vague or Generic
+ 
+List specific sections, claims, or advice across the top results that are:
+ 
+- Too generic to be actionable (e.g., "post regularly on social media")
+- Unsourced claims presented as facts
+- Recycled advice that appears copy-pasted across multiple results
+- Surface-level coverage of a topic that deserves depth
+---
+ 
+## Phase 3: Unique Additions & Data
+ 
+### Step 3.1 — Extra & Unique Information to Cover
+ 
+List what the final content SHOULD include that competitors missed, with:
+ 
+- The specific subtopic or angle
+- Why it matters for this keyword set
+- A credible source or starting point for the information
+### Step 3.2 — 3 Real Statistics or Data Points
+ 
+Find exactly 3 statistics directly related to the keywords. Each must include:
+ 
+- The exact number/percentage
+- The source name and URL
+- The year/date of the data
+Do NOT fabricate statistics. If you can't find a real one, say so — do not invent numbers.
+ 
+### Step 3.3 — 3 Real Numbers from Credible Sources
+ 
+Find 3 additional hard numbers (market size, user counts, growth rates, pricing, etc.) from credible sources. Each must include:
+ 
+- The number
+- Source name written next to it
+- Source URL
+These must be DIFFERENT from the statistics in Step 3.2.
+ 
+---
+ 
+## Phase 4: People Also Ask — 10-12 Questions
+ 
+Generate 10-12 real, unique questions people ask about the provided keywords. These must:
+ 
+- Be a mix of common questions (appearing in PAA boxes or forums) and unique ones you identify from gaps
+- Match the intent preference the user specified (mixed, informational, buyer, or custom)
+- NOT be generic filler questions — each should reveal a real information need
+- Include a note on where each question was found or why it was included
+Use search_web and fetch_url to find actual PAA questions, Reddit threads, Quora questions, and forum discussions related to the keywords.
+ 
+---
+ 
+## Phase 5: AI Overview Summary
+ 
+Write a short AI Overview summary in UNDER 50 words that:
+ 
+- Captures the core topic across all 5 keywords
+- Includes 1-2 very low-competition, low-difficulty related keywords (find these via search)
+- Reads like a natural, dense paragraph — not a list
+---
+ 
+## Phase 6: Compile the Research Document
+ 
+Produce a single .docx file using the office/docx skill with the following structure:
+ 
+### Document Structure
+ 
+**Page 1 — Cover / Header**
+- Title: "SERP Gap Research: [Niche/Topic]"
+- Keywords researched (all 5)
+- Date of research
+- "Prepared by: SERP Gap Research Agent"
+**Section 1 — AI Overview Summary**
+- The sub-50-word summary from Phase 5
+**Section 2 — SERP Competitor Landscape**
+- Table: Keyword | Rank | Page Title | URL | Brand/Site
+- One table per keyword, or a combined table grouped by keyword
+**Section 3 — Common Topics Across Top Results**
+- Bulleted list with frequency counts
+**Section 4 — Unique Angles Per Competitor**
+- Grouped by URL, what each covers that others don't
+**Section 5 — Content Gaps (What Nobody Covers)**
+- The gap analysis from Step 2.3
+- This is the most valuable section — be thorough and specific
+**Section 6 — Vague & Generic Content in Competitors**
+- List from Step 2.4 with specific examples and URLs
+**Section 7 — Recommended Unique Content Additions**
+- From Step 3.1, with sources
+**Section 8 — Statistics & Hard Data**
+- Combined table: Stat/Number | Value | Source Name | Source URL | Year
+**Section 9 — People Also Ask (10-12 Questions)**
+- Numbered list with intent tag and source/rationale for each
+**Section 10 — Banned Vocabulary Reference**
+- Include a condensed note: "Refer to the attached banned vocabulary guide when writing the final content. The research document itself does not follow these restrictions, but your published content must."
+- Reference the full list from `references/banned-vocabulary.md` — include the key categories (banned verbs, adjectives, nouns, transitions, phrases, structural rules, tone guidelines) as a quick-reference checklist in this section.
+**Section 11 — Sources Index**
+- All URLs cited in the document, grouped by section
+### Document Formatting
+ 
+- Use clean, readable formatting — headers, tables, bullet points
+- Every claim, stat, or data point must have its source URL inline
+- No decorative fluff — this is a working research document
+---
+ 
+## Execution Notes
+ 
+- **Parallelism**: Research all 5 keywords simultaneously using subagents. Don't do them sequentially.
+- **Source integrity**: Never fabricate URLs, stats, or source names. If a source can't be verified, flag it as "unverified" rather than inventing a citation.
+- **Depth over speed**: The user wants this to be MORE useful than all top 5 results combined. Surface-level summaries defeat the purpose.
+- **Banned vocabulary**: The blacklist in `references/banned-vocabulary.md` does NOT apply to this research document. It's included as a reference for the user when they write the final published content.
+- **Output**: Always produce a .docx file. Load the office/docx skill for document generation.
+ 
+
+
+ # Banned Vocabulary & Style Rules
+ 
+This file contains the full blacklist of prohibited words, phrases, and structural patterns.
+These rules apply ONLY to the final published content the user writes — NOT to the internal research document.
+However, include this file as a reference appendix in every research document so the user has it handy.
+ 
+---
+ 
+## I. PROHIBITED VOCABULARY (The "Blacklist")
+ 
+Do NOT use the following words in final published content. If you use them, the content fails the human-test.
+ 
+### Banned Verbs
+ 
+accelerate, achieve, activate, adapt, address, advance, aggregate, allocate, align, amplify, analyze, anticipate, apply, architect, articulate, assess, automate, benchmark, boost, build, calculate, calibrate, capture, categorize, centralize, champion, clarify, collaborate, communicate, compare, compile, conceptualize, configure, connect, consolidate, construct, contextualize, contribute, convert, coordinate, craft, create, curate, customize, define, democratize, deliver, deploy, design, develop, diagnose, differentiate, direct, discover, distribute, document, drive, elevate, embed, empower, enable, enrich, ensure, establish, evaluate, examine, execute, expand, explain, explore, extend, extract, facilitate, formulate, foster, future-proof, gamify, generate, generalize, grow, guide, harness, highlight, identify, implement, improve, incentivize, incorporate, increase, inform, inspire, integrate, interpret, introduce, innovate, iterate, launch, lead, leverage, maintain, manage, map, materialize, maximize, measure, minimize, mitigate, model, modify, monitor, navigate, normalize, offer, operationalize, optimize, orchestrate, organize, outline, overcome, parse, perform, personalize, plan, predict, prepare, present, prioritize, process, produce, promote, provide, quantify, query, reimagine, reframe, reinvent, re-engineer, recognize, recommend, reduce, refine, reinforce, replace, reshape, respond, retrieve, review, rewrite, revolutionize, scale, search, segment, select, shape, shift, showcase, simplify, simulate, solve, sort, specify, streamline, structure, summarize, supercharge, support, systematize, synthesize, tackle, tailor, test, track, train, transform, translate, unlock, unravel, update, upgrade, utilize, validate, verify, visualize, work, use, do, fix, change, show, help, save, spend, earn
+ 
+### Banned Adjectives
+ 
+adaptable, ambitious, analytical, appealing, applicable, artificial, attainable, authentic, automated-ready, balanced, baseline, beneficially-aligned, bold, business-ready, calculated, capable, client-centric, cloud-based, cohesive, commercial, common, competitive, complete, configurable, connected, consistent-performing, content-rich, controlled, convenient, core, credible, critical-thinking, cross-platform, current, customizable-ready, data-backed, data-centric, dependable, deployable, differentiated, digitized, disciplined, disruptive-ready, distinct, distributed, domain-specific, economic, elastic, enabling, end-user-focused, engineered, enriched, evolving, exact, exceptional, executable, expandable, experiential, experimental, expert-level, extensible, external, fast-moving, feature-rich, field-tested, fine-tuned, fit-for-purpose, flexible-ready, focused, foundational, friction-reducing, fully-managed, functional-ready, goal-oriented, growth-focused, hands-on, high-level, human-centric, ideal, implementation-ready, improved-ready, in-depth, incremental, industry-leading, influential, informative, initial, innovative-ready, input-driven, insightful, instant, institutional, integrated-ready, intentional, internal, intuitive-ready, iterative, knowledge-based, large-scale, lean, lifecycle-based, long-term, low-cost, managed, market-ready, measurable-ready, metric-driven, minimal, mission-critical, multi-layered, multi-purpose, multi-step, native, need-based, next-gen, objective, on-demand, operational, outcome-based, outcome-focused, output-driven, performance-based, performance-focused, practical, pre-built, predictive-ready, premium, prepared, process-driven, production-ready, professional, progressive-ready, project-based, purpose-driven, quality-focused, quick, ready-to-use, real-world, refined-ready, repeatable-ready, resource-efficient, result-focused, role-based, scenario-based, scalable-ready, secure-ready, segment-specific, service-oriented, simplified-ready, single-source, solution-focused, specialized, standards-based, step-by-step, structured-ready, success-oriented, system-driven, task-based, tech-enabled, testable, time-saving, trackable, trend-based, trust-based, user-centric, value-based, value-driven, vertical-specific, well-structured, workflow-based, unparalleled, groundbreaking, revolutionary, transformative, pivotal, game-changing, phenomenal, remarkable, extraordinary, unwavering, indelible, profound, resilient, vibrant, captivating, unprecedented, significant, paradigm-shifting, high-octane, cutting-edge, seamless, robust, scalable, synergy-driven, holistic, comprehensive, dynamic, strategic, optimized, streamlined, multifaceted, agile, proactive, synergistic, future-proof, high-impact, industry-standard, best-in-class, mission-driven, value-added, enterprise-grade, end-to-end, frictionless, versatile, nuanced, intricate, myriad, notable, diverse, extensive, paramount, relevant, essential, vital, crucial, substantial, considerable, effective, efficient, reliable, sustainable, tangible, meaningful, compelling, methodological, systemic, conceptual, functional, operational, contextual, quantitative, qualitative, empirical, definitive, standardized, uniform, procedural, structural, fundamental, primary, secondary, integral, component-based, framework-oriented, agentic, generative-first, prompt-ready, geo-optimized, latency-sensitive, reasoning-heavy, alignment-focused, multimodal-capable, privacy-preserving, token-efficient, human-in-the-loop, data-saturated, model-agnostic, synthetic-driven, recursive, bespoke, overarching, pivotal, meticulous, underscored, burgeoning, multifaceted, quintessential, non-negotiable, high-fidelity, interoperable, cross-functional, socio-economic, hyper-personalized, ultra-secure, automated, tech-savvy, forward-thinking, user-first, outcome-oriented
+ 
+### Banned Nouns/Concepts
+ 
+abstraction, accuracy, action, adaptation, adoption, advancement, agent, agentic-workflow, algorithm, alignment, analytics, annotation, API, application, approach, architecture, architecture-pattern, artifact, artifact-store, asset, assistant, assurance, attention, attribute, augmentation, automation, baseline, behavior, benchmark, benchmark-suite, bot, bottleneck, boundary, blueprint, breakthrough, business-case, cadence, cadence-plan, capability, capability-matrix, capacity, chain, channel, chatbot, checkpoint, classification, classifier, classifier-head, cluster, cluster-center, code, codebase, co-pilot, collaboration, collaboration-layer, command, communication, completion, component, concept, configuration, connection, construct, consumer, constraint, context, context-window, control, convergence, conversion, conversation, conversation-flow, core, corpus, corpus-segment, cost-curve, criterion, customization, cycle, data, data-lake, data-pipeline, data-product, data-source, data-store, database, dataset, dataset-split, decision, decision-boundary, decision-tree, decoder, debug-session, delivery, demand, deployment, depth, design, development, dialogue, differentiation, dimension, directive, direction, discipline, discovery, distribution, diversity, domain, drift, drift-monitor, driver, ecosystem, efficiency, element, embedding, embedding-space, enablement, endpoint, endpoint-policy, engine, entity, environment, epoch, error, estimation, evaluation, event, execution, expansion, experience, experience-layer, experiment, expertise, explanation, explainability, fall-back, feature, feedback, feedback-loop, filter, fine-tuning, fine-tuning-run, flow, focus, foundation, foundation-model, framework, frontier, function, generation, goal, governance, graph, ground-truth, growth, guideline, guardrail, guardrail-policy, hallucination, hierarchy, human-in-the-loop, hyperparameter, implementation, improvement, indicator, inference, inference-endpoint, ingestion, input, insight, insights-report, instance, instruction, intent, intent-classifier, interface, iteration-cycle, iteration-loop, journey, knowledge, knowledge-base, knowledge-graph, knowledge-worker, label, latency, latency-budget, layer, learning, lifecycle, limitation, lineage, load-balancer, logic, loss, management, market, measure, memory, memory-store, metadata, metric, metric-dashboard, milestone, modality, model, model-card, model-family, model-version, module, monitoring, monitoring-stack, namespace, network, node, noise, notation, nuance, objective, objective-function, observation, observability, operation, optimization-cycle, orchestration, organization, outcome, output, output-quality, overview, offline-evaluation, online-evaluation, parameter, pathway, pattern, payload, performance, persona, pipeline, pipeline-stage, planning, platform, policy, policy-engine, potential, precision, prediction, preprocessing, priority, process, product, program, project, prompt, prompt-engineering, prompt-template, prompt-token, prototype, prototype-stage, proxy, quality, query, queue, reasoning, recall, recall-rate, recommendation, recommendation-engine, record, red-team, refinement-loop, regulation, reliability, reinforcement-learning, requirement, representation, resource, response, result, retrieval, risk-assessment, roadmap, role, rollout-strategy, runtime, safety-layer, safety-policy, sample, sampling, scenario, schema, scope, scorecard, scoring, segment, semantic-search, sequence, service, session, session-token, setup, shadow-deployment, signal, signal-to-noise, simulation, snapshot, solution, source, specification, spike, stack, stage, stakeholder, state-space, step, strategy, stream, structure-model, subsystem, summary, syntax, system, synthetic-data, task, technique, technology-stack, telemetry, template, tensor, test-suite, threshold, throughput, timeline, token, token-limit, tooling, topic, trade-off, traffic-routing, training, transformation, trend, trigger, trust-layer, trust-score, understanding, unit, update, use-case, use-pattern, user-flow, user-journey, utility, validation, value, variable, vector, vector-database, vector-space, version, vision, watermark, weight, window, workflow, workload, zero-shot-setting
+ 
+### Banned Transitions/Fillers
+ 
+accordingly, additionally, after that, all things considered, alternatively, apart from that, as an illustration, as expected, as it happens, as it turns out, as things stand, at this point, at times, back to the point, by comparison, by contrast, by implication, by the same token, come to think of it, comparatively, considering this, considering that, different from this, earlier, even better, even more, even then, following this, for clarity, for context, for that matter, from this perspective, further, further still, here again, in comparison, in doing so, in general, in hindsight, in line with this, in more detail, in retrospect, in turn, in view of this, just as important, later on, likewise, more importantly, much like this, next up, now then, on balance, on closer look, on this basis, once again, once more, over time, prior to this, provided that, rather, regardless of that, separately, shortly, since then, soon after, speaking generally, subsequently, taking this further, that being the case, the point is, thereafter, this aside, this in turn, this way, to go further, to reiterate, to simplify, to take it further, under these conditions, until now, up to this point, what this means is, with this, without a doubt
+ 
+---
+ 
+## II. BANNED PHRASES & CLICHÉS
+ 
+### Banned Openers
+- "In today's fast-paced world,"
+- "In the digital age,"
+- "In this article, we will,"
+- "Whether you're a beginner or an expert,"
+- "Let's explore,"
+- "Let's dive in."
+### Banned Logic Fillers
+- "It is important to note,"
+- "It's worth noting,"
+- "It goes without saying,"
+- "As we navigate the complexities of,"
+- "When it comes to,"
+- "At the end of the day,"
+- "The power of,"
+- "Pave the way,"
+- "Bridge the gap."
+### Banned Conclusions
+- "In conclusion,"
+- "In summary,"
+- "To sum up,"
+- "By implementing these strategies,"
+- "Stay ahead of the curve,"
+- "Embracing X is not just an option, it's a necessity."
+---
+ 
+## III. STRUCTURAL & SYNTACTIC RULES
+ 
+1. **Sentence Variety**: Avoid the "AI Symmetry." Mix very short, punchy sentences (3-5 words) with longer ones. Occasional sentence fragments are encouraged for impact.
+2. **No "Balanced" Lists**: Do not write triple-adjective lists (e.g., "Fast, reliable, and easy"). Do not make every bullet point the same length.
+3. **The "Anti-Essay" Flow**: Avoid rigid Intro-Body-Conclusion structure. Start in the middle of a thought or with a bold observation.
+4. **Avoid "Not Only/But Also"**: This is a massive AI giveaway. Direct statements only.
+5. **Plain Language**: "use" instead of "utilize," "plan" instead of "strategy," "new tools" instead of "cutting-edge technology."
+---
+ 
+## IV. THE "HUMAN" TONE GUIDELINES
+ 
+1. **Expert Bias**: Don't be a neutral observer. Have an opinion. Be slightly critical or bold where appropriate.
+2. **Real-World Texture**: Specific examples, messy human observations, or small contradictions. Don't explain basics as if the reader is a child — assume they're smart.
+3. **Contractions**: Always (don't, can't, won't) to keep the tone conversational.
+4. **The Parting Shot**: Instead of summarizing at the end, leave the reader with a sharp, memorable final thought or a call to action that doesn't sound like marketing-speak.
+ 

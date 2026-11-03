@@ -52,3 +52,4 @@ async def delete_brand(
     db: AsyncSession = Depends(get_db)
 ):
     await BrandService.delete_brand(brand_id, current_user.organization_id, db)
+

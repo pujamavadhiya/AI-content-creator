@@ -3,7 +3,8 @@ import {
   Brand, ReferenceCollection, ReferenceDocument, Keyword,
   Topic, TopicCluster, ContentOutline, GeneratedContent,
   ContentEvaluation, CalendarEvent, AnalyticsSummary,
-  AIProviderInfo, User
+  AIProviderInfo, User, HumanToneAuditResult, MultiPlatformKeywordResult,
+  SerpGapResult, UrlRewriteResult
 } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
@@ -283,4 +284,54 @@ export const apiClient = {
     const res = await api.post('/api/ai/test-connection', { provider_slug: providerSlug });
     return res.data;
   },
+
+  // --- Specialized Skills ---
+  // Skill 1: Human-Tone Writer & Anti-AI Blacklist Auditor
+  auditHumanTone: async (text: string): Promise<HumanToneAuditResult> => {
+    const res = await api.post('/api/content/human-audit', { text });
+    return res.data;
+  },
+
+  // Skill 2: Multi-Platform Keyword Research Engine (Keyword Planner Seeds + 8 Platform Groups)
+  generateMultiPlatformKeywords: async (data: {
+    topic: string;
+    industry?: string;
+    target_audience?: string;
+    business_type?: string;
+    brand_id?: string;
+  }): Promise<MultiPlatformKeywordResult> => {
+    const res = await api.post('/api/research/keywords/multi-platform', data);
+    return res.data;
+  },
+
+  // Skill 3: Live Page Audit & AEO Content Rewriter with URL
+  rewriteUrlContent: async (data: {
+    url: string;
+    primary_keyword?: string;
+    page_type?: string;
+    author_name?: string;
+  }): Promise<UrlRewriteResult> => {
+    const res = await api.post('/api/content/url-rewrite', data);
+    return res.data;
+  },
+
+  // Skill 4: SERP Gap Research & Competitor Optimization
+  analyzeSerpGaps: async (data: {
+    keywords: string[];
+    niche: string;
+    content_type?: string;
+    intent_preference?: string;
+    language?: string;
+  }): Promise<SerpGapResult> => {
+    const res = await api.post('/api/research/serp-gap', data);
+    return res.data;
+  },
+
+  exportSerpGapDocx: async (data: SerpGapResult): Promise<Blob> => {
+    const res = await api.post('/api/research/serp-gap/export', data, {
+      responseType: 'blob'
+    });
+    return res.data;
+  },
 };
+

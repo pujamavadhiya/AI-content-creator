@@ -5,21 +5,23 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   Sparkles, CheckCircle2, ArrowRight, ArrowLeft, KeyRound,
-  Compass, ListOrdered, PenTool, Share2, BookOpen, Building2
+  Compass, ListOrdered, PenTool, Share2, BookOpen, Building2,
+  Globe, Download, Copy, FileText, ExternalLink, ShieldCheck, RefreshCw, Search, Wand2
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { apiClient } from '@/lib/api';
-import { Keyword, Topic, ContentOutline } from '@/types';
+import { Keyword, Topic, ContentOutline, SerpGapResult, UrlRewriteResult } from '@/types';
 
 export default function ResearchWorkflowPage() {
   const router = useRouter();
   const { brands, activeBrand, setActiveBrand, collections, activeCollection, setActiveCollection, showToast } = useApp();
 
+  const [researchMode, setResearchMode] = useState<'pipeline' | 'serp_gap' | 'url_rewrite'>('pipeline');
+
+  // Pipeline Wizard State
   const [currentStep, setCurrentStep] = useState(1);
   const [topicPrompt, setTopicPrompt] = useState('Enterprise Retrieval Augmented Generation Architecture');
   const [targetAudience, setTargetAudience] = useState('Chief Technology Officers & Engineering Directors');
-  
-  // Pipeline Data
   const [keywords, setKeywords] = useState<Keyword[]>([]);
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -30,6 +32,30 @@ export default function ResearchWorkflowPage() {
   const [generatingKeywords, setGeneratingKeywords] = useState(false);
   const [generatingTopics, setGeneratingTopics] = useState(false);
   const [generatingOutline, setGeneratingOutline] = useState(false);
+
+  // Skill 4: SERP Gap Research State
+  const [serpKeywords, setSerpKeywords] = useState<string[]>([
+    'enterprise AI automation',
+    'AI workflow tools',
+    'RAG search architecture',
+    'autonomous AI agents',
+    'LLM orchestration platform'
+  ]);
+  const [serpNiche, setSerpNiche] = useState('Enterprise AI & Workflow Automation');
+  const [serpContentType, setSerpContentType] = useState('blog');
+  const [serpIntent, setSerpIntent] = useState('buyer');
+  const [serpResult, setSerpResult] = useState<SerpGapResult | null>(null);
+  const [serpLoading, setSerpLoading] = useState(false);
+  const [exportingDocx, setExportingDocx] = useState(false);
+
+  // Skill 3: Live Page Audit & AEO Content Rewriter State
+  const [urlInput, setUrlInput] = useState('https://mxicoders.com/services/ai-development');
+  const [primaryKwInput, setPrimaryKwInput] = useState('Enterprise AI Development Services');
+  const [pageTypeInput, setPageTypeInput] = useState('service');
+  const [authorNameInput, setAuthorNameInput] = useState('Ashok Rathod - Tech Consultant');
+  const [urlRewriteResult, setUrlRewriteResult] = useState<UrlRewriteResult | null>(null);
+  const [urlRewriting, setUrlRewriting] = useState(false);
+  const [copiedRewriteBody, setCopiedRewriteBody] = useState(false);
 
   const steps = [
     { num: 1, label: 'Brand & References' },
@@ -109,18 +135,105 @@ export default function ResearchWorkflowPage() {
     }
   };
 
+  const handleRunSerpGap = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSerpLoading(true);
+    try {
+      const res = await apiClient.analyzeSerpGaps({
+        keywords: serpKeywords.filter(Boolean),
+        niche: serpNiche,
+        content_type: serpContentType,
+        intent_preference: serpIntent
+      });
+      setSerpResult(res);
+      showToast('SERP Gap teardown complete! Found actionable content gaps and stats.', 'success');
+    } catch (err: any) {
+      showToast(err.response?.data?.detail || 'SERP gap analysis failed', 'error');
+    } finally {
+      setSerpLoading(false);
+    }
+  };
+
+  const handleExportSerpDocx = async () => {
+    if (!serpResult) return;
+    setExportingDocx(true);
+    try {
+      const blob = await apiClient.exportSerpGapDocx(serpResult);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `SERP_Gap_${serpNiche.replace(/\s+/g, '_')}.docx`;
+      a.click();
+      showToast('Downloaded SERP Gap Research .docx report', 'success');
+    } catch (e) {
+      showToast('Failed to export .docx report', 'error');
+    } finally {
+      setExportingDocx(false);
+    }
+  };
+
+  const handleRunUrlRewrite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!urlInput) return;
+    setUrlRewriting(true);
+    try {
+      const res = await apiClient.rewriteUrlContent({
+        url: urlInput,
+        primary_keyword: primaryKwInput,
+        page_type: pageTypeInput,
+        author_name: authorNameInput
+      });
+      setUrlRewriteResult(res);
+      showToast('Live page analyzed and AEO replacement content produced!', 'success');
+    } catch (err: any) {
+      showToast(err.response?.data?.detail || 'URL rewrite analysis failed', 'error');
+    } finally {
+      setUrlRewriting(false);
+    }
+  };
+
   return (
     <div>
-      <div style={{ marginBottom: 28 }}>
+      <div style={{ marginBottom: 20 }}>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>
-          Research & Intelligence Workflow
+          Research & Intelligence Hub
         </h1>
         <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: 4 }}>
-          Reference Material → Content Understanding → Keywords → Topics → Outlines → Content Studio.
+          Comprehensive research workspace: guided end-to-end pipeline, SERP competitor gap research, and live page AEO rewrites.
         </p>
       </div>
 
-      {/* Progress Steps Header */}
+      {/* Mode Navigation Tabs */}
+      <div style={{ display: 'flex', gap: 10, marginBottom: 24, borderBottom: '1px solid #e2e8f0', paddingBottom: 10 }}>
+        <button
+          onClick={() => setResearchMode('pipeline')}
+          className={researchMode === 'pipeline' ? 'btn-primary' : 'btn-ghost'}
+          style={{ fontSize: '0.875rem' }}
+        >
+          <Sparkles size={15} />
+          <span>Guided Content Pipeline (6-Step)</span>
+        </button>
+        <button
+          onClick={() => setResearchMode('serp_gap')}
+          className={researchMode === 'serp_gap' ? 'btn-primary' : 'btn-ghost'}
+          style={{ fontSize: '0.875rem' }}
+        >
+          <Search size={15} />
+          <span>SERP Competitor Gap Research (.docx Export)</span>
+        </button>
+        <button
+          onClick={() => setResearchMode('url_rewrite')}
+          className={researchMode === 'url_rewrite' ? 'btn-primary' : 'btn-ghost'}
+          style={{ fontSize: '0.875rem' }}
+        >
+          <Globe size={15} />
+          <span>Live URL Audit & AEO Content Rewriter</span>
+        </button>
+      </div>
+
+      {researchMode === 'pipeline' && (
+        <div>
+          {/* Progress Steps Header */}
       <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 24px', marginBottom: 28 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           {steps.map((s, idx) => {
@@ -460,7 +573,376 @@ export default function ResearchWorkflowPage() {
             </div>
           </div>
         )}
+        </div>
       </div>
+      )}
+
+      {/* SKILL 4: SERP Gap Research View */}
+      {researchMode === 'serp_gap' && (
+        <div>
+          {/* Input Form */}
+          <div style={{ background: 'white', borderRadius: 12, border: '1px solid #e2e8f0', padding: 24, marginBottom: 24 }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', marginBottom: 6 }}>
+              Competitive SERP Gap Teardown
+            </h3>
+            <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: 18 }}>
+              Tear apart top-ranking Google competitors across 5 keywords. Extract content gaps, verified stats, hard numbers, and export a Word .docx brief.
+            </p>
+
+            <form onSubmit={handleRunSerpGap} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: 4 }}>
+                    Niche / Industry
+                  </label>
+                  <input
+                    style={{ width: '100%', fontSize: '0.9rem', padding: '8px 12px' }}
+                    value={serpNiche}
+                    onChange={(e) => setSerpNiche(e.target.value)}
+                    required
+                  />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: 4 }}>
+                      Content Type
+                    </label>
+                    <select
+                      style={{ width: '100%', fontSize: '0.85rem', padding: '8px' }}
+                      value={serpContentType}
+                      onChange={(e) => setSerpContentType(e.target.value)}
+                    >
+                      <option value="blog">Blog / Article</option>
+                      <option value="service">Service / Landing Page</option>
+                      <option value="both">Both</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: 4 }}>
+                      Question Intent
+                    </label>
+                    <select
+                      style={{ width: '100%', fontSize: '0.85rem', padding: '8px' }}
+                      value={serpIntent}
+                      onChange={(e) => setSerpIntent(e.target.value)}
+                    >
+                      <option value="buyer">Buyer Intent</option>
+                      <option value="informational">Informational</option>
+                      <option value="mixed">Mixed Intent</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: 4 }}>
+                  5 Target Keywords (1 per line or comma-separated)
+                </label>
+                <input
+                  style={{ width: '100%', fontSize: '0.9rem', padding: '8px 12px' }}
+                  value={serpKeywords.join(', ')}
+                  onChange={(e) => setSerpKeywords(e.target.value.split(',').map(s => s.trim()))}
+                  required
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 6 }}>
+                <button type="submit" disabled={serpLoading} className="btn-primary" style={{ padding: '10px 24px' }}>
+                  <Sparkles size={16} />
+                  <span>{serpLoading ? 'Analyzing SERP Competitors...' : 'Run SERP Gap Analysis'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {serpResult && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+              {/* Header with Export */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc', padding: 20, borderRadius: 12, border: '1px solid #e2e8f0' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a' }}>
+                    SERP Gap Research Report: {serpResult.niche}
+                  </h3>
+                  <p style={{ fontSize: '0.85rem', color: '#64748b', marginTop: 4 }}>
+                    Analyzed against: {serpResult.keywords?.join(' • ')}
+                  </p>
+                </div>
+                <button onClick={handleExportSerpDocx} disabled={exportingDocx} className="btn-secondary">
+                  <Download size={16} />
+                  <span>{exportingDocx ? 'Generating Word Doc...' : 'Download Word Doc (.docx)'}</span>
+                </button>
+              </div>
+
+              {/* Sub-50-word AI Overview */}
+              <div style={{ background: '#ecfdf5', borderRadius: 12, border: '1px solid #a7f3d0', padding: 20 }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#065f46', textTransform: 'uppercase', marginBottom: 6 }}>
+                  1. AI Overview Summary (Under 50 Words)
+                </div>
+                <p style={{ fontSize: '0.95rem', fontWeight: 600, color: '#064e3b', lineHeight: 1.5 }}>
+                  "{serpResult.ai_overview_summary}"
+                </p>
+              </div>
+
+              {/* High-Value Content Gaps */}
+              <div style={{ background: 'white', borderRadius: 12, border: '1px solid #e2e8f0', padding: 24 }}>
+                <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', marginBottom: 14 }}>
+                  🚨 What Top Competitors Missed (Critical Content Gaps)
+                </h4>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 14 }}>
+                  {serpResult.content_gaps?.map((gap, i) => (
+                    <div key={i} style={{ background: '#fffbeb', border: '1px solid #fef3c7', padding: 14, borderRadius: 8 }}>
+                      <div style={{ fontWeight: 700, color: '#92400e', fontSize: '0.9rem', marginBottom: 4 }}>
+                        {gap.gap_area}
+                      </div>
+                      <p style={{ fontSize: '0.85rem', color: '#78350f' }}>{gap.why_it_matters}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Vague Advice to Replace */}
+              <div style={{ background: 'white', borderRadius: 12, border: '1px solid #e2e8f0', padding: 24 }}>
+                <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', marginBottom: 14 }}>
+                  ✂️ Generic Competitor Claims to Replace with Concrete Depth
+                </h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {serpResult.vague_generic_content_to_replace?.map((item, i) => (
+                    <div key={i} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: 14, borderRadius: 8, fontSize: '0.85rem' }}>
+                      <div style={{ color: '#ef4444', textDecoration: 'line-through', marginBottom: 4 }}>
+                        Competitor claim: "{item.competitor_claim}"
+                      </div>
+                      <div style={{ color: '#64748b', marginBottom: 6 }}>
+                        Why it's weak: {item.flaw}
+                      </div>
+                      <div style={{ color: '#059669', fontWeight: 600 }}>
+                        Our Solution: {item.how_we_fix}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Real Stats & Numbers */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                <div style={{ background: 'white', borderRadius: 12, border: '1px solid #e2e8f0', padding: 20 }}>
+                  <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a', marginBottom: 12 }}>
+                    📊 3 Verified Statistics (With Sources)
+                  </h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {serpResult.statistics?.map((st, i) => (
+                      <div key={i} style={{ background: '#f8fafc', padding: 12, borderRadius: 8, fontSize: '0.85rem' }}>
+                        <div style={{ fontWeight: 700, color: '#1e293b', marginBottom: 4 }}>{st.stat}</div>
+                        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                          Source: {st.source_name} ({st.year}) — <a href={st.source_url} target="_blank" rel="noreferrer" style={{ color: '#6366f1' }}>{st.source_url}</a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ background: 'white', borderRadius: 12, border: '1px solid #e2e8f0', padding: 20 }}>
+                  <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a', marginBottom: 12 }}>
+                    📈 3 Hard Numbers & Benchmarks
+                  </h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {serpResult.hard_numbers?.map((hn, i) => (
+                      <div key={i} style={{ background: '#f8fafc', padding: 12, borderRadius: 8, fontSize: '0.85rem' }}>
+                        <div style={{ fontWeight: 700, color: '#1e293b', marginBottom: 4 }}>
+                          {hn.metric_type}: <span style={{ color: '#6366f1' }}>{hn.number}</span>
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                          Source: {hn.source_name} — <a href={hn.source_url} target="_blank" rel="noreferrer" style={{ color: '#6366f1' }}>{hn.source_url}</a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* People Also Ask */}
+              <div style={{ background: 'white', borderRadius: 12, border: '1px solid #e2e8f0', padding: 24 }}>
+                <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', marginBottom: 14 }}>
+                  ❓ People Also Ask (Search Intent Questions)
+                </h4>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 10 }}>
+                  {serpResult.people_also_ask?.map((q, i) => (
+                    <div key={i} style={{ background: '#f8fafc', padding: 12, borderRadius: 8, fontSize: '0.85rem' }}>
+                      <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: 4 }}>
+                        {i + 1}. {q.question}
+                      </div>
+                      <span className="badge badge-neutral" style={{ fontSize: '0.7rem' }}>
+                        {q.intent}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* SKILL 3: Live URL Audit & AEO Content Rewriter */}
+      {researchMode === 'url_rewrite' && (
+        <div>
+          {/* Input Form */}
+          <div style={{ background: 'white', borderRadius: 12, border: '1px solid #e2e8f0', padding: 24, marginBottom: 24 }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', marginBottom: 6 }}>
+              Live Page URL Audit & AEO Content Rewriter
+            </h3>
+            <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: 18 }}>
+              Diagnoses a live URL for technical gaps and rewrites it for Google AI Mode, ChatGPT Search, and Perplexity with comparison tables and FAQs.
+            </p>
+
+            <form onSubmit={handleRunUrlRewrite} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: 4 }}>
+                  Target Live URL
+                </label>
+                <input
+                  style={{ width: '100%', fontSize: '0.9rem', padding: '8px 12px' }}
+                  placeholder="https://example.com/page-to-rewrite"
+                  value={urlInput}
+                  onChange={(e) => setUrlInput(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: 4 }}>
+                  Primary Keyword this Page Should Own
+                </label>
+                <input
+                  style={{ width: '100%', fontSize: '0.9rem', padding: '8px 12px' }}
+                  value={primaryKwInput}
+                  onChange={(e) => setPrimaryKwInput(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: 4 }}>
+                  Page Purpose
+                </label>
+                <select
+                  style={{ width: '100%', fontSize: '0.85rem', padding: '8px' }}
+                  value={pageTypeInput}
+                  onChange={(e) => setPageTypeInput(e.target.value)}
+                >
+                  <option value="service">Service Page (Conversion & Objections)</option>
+                  <option value="blog">Blog / Informational Guide</option>
+                  <option value="landing">Landing Page Copy</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: 4 }}>
+                  Author Credential Attribution
+                </label>
+                <input
+                  style={{ width: '100%', fontSize: '0.9rem', padding: '8px 12px' }}
+                  value={authorNameInput}
+                  onChange={(e) => setAuthorNameInput(e.target.value)}
+                />
+              </div>
+
+              <div style={{ gridColumn: 'span 2', display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+                <button type="submit" disabled={urlRewriting} className="btn-primary" style={{ padding: '10px 24px' }}>
+                  <Wand2 size={16} />
+                  <span>{urlRewriting ? 'Auditing & Rewriting Live Page...' : 'Audit Page & Generate AEO Content'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {urlRewriteResult && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+              {/* Before Diagnosis Summary */}
+              <div style={{ background: '#f8fafc', borderRadius: 12, border: '1px solid #cbd5e1', padding: 24 }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', marginBottom: 12 }}>
+                  🔍 Before: Live Page Diagnosis
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 14, marginBottom: 16 }}>
+                  <div style={{ background: 'white', padding: 12, borderRadius: 8, fontSize: '0.85rem' }}>
+                    <div style={{ color: '#64748b', fontSize: '0.75rem' }}>Current Title Tag</div>
+                    <strong>{urlRewriteResult.before_diagnosis?.current_title || 'None'}</strong>
+                  </div>
+                  <div style={{ background: 'white', padding: 12, borderRadius: 8, fontSize: '0.85rem' }}>
+                    <div style={{ color: '#64748b', fontSize: '0.75rem' }}>Current Word Count</div>
+                    <strong>~{urlRewriteResult.before_diagnosis?.word_count || 0} words</strong>
+                  </div>
+                  <div style={{ background: 'white', padding: 12, borderRadius: 8, fontSize: '0.85rem' }}>
+                    <div style={{ color: '#64748b', fontSize: '0.75rem' }}>Schema Status</div>
+                    <strong>{urlRewriteResult.before_diagnosis?.schema_status || 'Unverified'}</strong>
+                  </div>
+                </div>
+
+                <div style={{ fontSize: '0.85rem', color: '#92400e', background: '#fffbeb', padding: 12, borderRadius: 8, border: '1px solid #fef3c7' }}>
+                  <strong>Identified Flaws:</strong>
+                  <ul style={{ paddingLeft: 18, marginTop: 4 }}>
+                    {urlRewriteResult.before_diagnosis?.identified_gaps?.map((gap, i) => (
+                      <li key={i}>{gap}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* What's Changing and Why */}
+              <div style={{ background: 'white', borderRadius: 12, border: '1px solid #e2e8f0', padding: 24 }}>
+                <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', marginBottom: 10 }}>
+                  ⚡ What's Changing and Why
+                </h4>
+                <ul style={{ paddingLeft: 20, fontSize: '0.875rem', color: '#334155', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {urlRewriteResult.whats_changing_and_why?.map((reason, i) => (
+                    <li key={i}>{reason}</li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Replacement Content */}
+              <div style={{ background: 'white', borderRadius: 12, border: '1px solid #e2e8f0', padding: 24 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
+                    ✨ Full CMS-Ready Replacement Content
+                  </h4>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(urlRewriteResult.replacement_content.body_markdown);
+                      setCopiedRewriteBody(true);
+                      showToast('Copied full markdown replacement body to clipboard', 'success');
+                      setTimeout(() => setCopiedRewriteBody(false), 3000);
+                    }}
+                    className="btn-secondary"
+                  >
+                    <Copy size={14} />
+                    <span>{copiedRewriteBody ? 'Copied!' : 'Copy Markdown'}</span>
+                  </button>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14, marginBottom: 18, background: '#f8fafc', padding: 16, borderRadius: 8 }}>
+                  <div>
+                    <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block' }}>New Title Tag</span>
+                    <strong style={{ fontSize: '0.9rem', color: '#0f172a' }}>{urlRewriteResult.replacement_content.new_title_tag}</strong>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block' }}>New Meta Description</span>
+                    <strong style={{ fontSize: '0.9rem', color: '#0f172a' }}>{urlRewriteResult.replacement_content.new_meta_description}</strong>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block' }}>Author Credit</span>
+                    <strong style={{ fontSize: '0.9rem', color: '#0f172a' }}>{urlRewriteResult.replacement_content.author_attribution}</strong>
+                  </div>
+                </div>
+
+                {/* Body Markdown Content */}
+                <div style={{ background: '#0f172a', color: '#f8fafc', padding: 20, borderRadius: 8, fontSize: '0.85rem', fontFamily: 'monospace', maxHeight: 400, overflowY: 'auto', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+                  {urlRewriteResult.replacement_content.body_markdown}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
+

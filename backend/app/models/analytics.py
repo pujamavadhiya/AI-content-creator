@@ -22,3 +22,4 @@ class ActivityLog(TimeStampedModel):
     entity_type = Column(String(100), nullable=False)  # brand, document, content, calendar, etc.
     entity_id = Column(String(36), nullable=True)
     details = Column(JSON, default=dict, nullable=False)
+

@@ -90,3 +90,4 @@ class GeminiProvider(BaseAIProvider):
             "message": f"Successfully connected to Gemini API ({self.model_name})",
             "model": self.model_name
         }
+

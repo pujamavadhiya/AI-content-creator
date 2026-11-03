@@ -78,3 +78,4 @@ class ClaudeProvider(BaseAIProvider):
             "message": f"Successfully connected to Claude API ({self.model_name})",
             "model": self.model_name
         }
+

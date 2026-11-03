@@ -36,10 +36,37 @@ class MultiPlatformGenerateRequest(BaseModel):
 class RewriteRequest(BaseModel):
     content_id: Optional[str] = None
     selected_text: str
-    action: str  # rewrite, grammar, professional, conversational, simplify, expand, shorten, add_examples, improve_intro, improve_conclusion, alt_headings, improve_seo, change_tone, translate, generate_cta
+    action: str  # rewrite, grammar, professional, conversational, simplify, expand, shorten, add_examples, improve_intro, improve_conclusion, alt_headings, improve_seo, change_tone, translate, generate_cta, human_tone
     custom_instruction: Optional[str] = None
     tone: Optional[str] = None
     language: Optional[str] = None
+
+class HumanToneAuditRequest(BaseModel):
+    text: str
+
+class HumanToneAuditResponse(BaseModel):
+    score: float
+    passes_human_test: bool
+    total_violations: int
+    banned_words_found: List[str]
+    banned_phrases_found: List[str]
+    uncontracted_forms_found: List[str]
+    cliche_opener_detected: bool
+    summary_conclusion_detected: bool
+    suggested_replacements: Dict[str, str]
+
+class UrlRewriteRequest(BaseModel):
+    url: str
+    primary_keyword: Optional[str] = None
+    page_type: str = "blog"  # blog, service, landing
+    author_name: str = "Ashok Rathod - Tech Consultant"
+
+class UrlRewriteResponse(BaseModel):
+    url: str
+    primary_keyword: str
+    before_diagnosis: Dict[str, Any]
+    whats_changing_and_why: List[str]
+    replacement_content: Dict[str, Any]
 
 class ContentUpdate(BaseModel):
     title: Optional[str] = None
@@ -94,3 +121,4 @@ class EvaluationResponse(BaseModel):
 
     class Config:
         from_attributes = True
+

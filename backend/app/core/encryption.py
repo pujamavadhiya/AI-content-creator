@@ -31,3 +31,4 @@ def decrypt_credential(encrypted_text: str) -> str:
     except Exception:
         # If decryption fails (e.g. key changed or corrupt), return empty or log
         return ""
+

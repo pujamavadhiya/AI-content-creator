@@ -14,3 +14,4 @@ async def get_analytics_summary(
     db: AsyncSession = Depends(get_db)
 ):
     return await AnalyticsService.get_summary(current_user.organization_id, db)
+

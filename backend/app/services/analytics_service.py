@@ -82,3 +82,4 @@ class AnalyticsService:
             platform_breakdown=platform_breakdown,
             recent_activities=recent_activities
         )
+

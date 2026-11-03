@@ -40,3 +40,4 @@ class OrganizationResponse(BaseModel):
         from_attributes = True
 
 TokenResponse.model_rebuild()
+

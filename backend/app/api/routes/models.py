@@ -149,3 +149,4 @@ async def test_connection(
             message=f"Connection check failed: {str(e)}",
             model=data.provider_slug
         )
+

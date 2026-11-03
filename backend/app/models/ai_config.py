@@ -31,3 +31,4 @@ class APICredential(TimeStampedModel):
     key_hint = Column(String(20), nullable=False)  # e.g., "...Ab4e"
     is_valid = Column(Boolean, default=True, nullable=False)
     last_tested_at = Column(DateTime(timezone=True), nullable=True)
+

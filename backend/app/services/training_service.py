@@ -100,3 +100,4 @@ class TrainingService:
         stmt = select(TrainingDataset).where(TrainingDataset.organization_id == org_id).order_by(TrainingDataset.created_at.desc())
         res = await db.execute(stmt)
         return list(res.scalars().all())
+

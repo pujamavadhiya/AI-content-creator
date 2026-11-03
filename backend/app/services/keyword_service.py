@@ -3,9 +3,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.models.research import Keyword
 from app.models.brand import Brand
-from app.schemas.research import KeywordGenerateRequest
+from app.schemas.research import KeywordGenerateRequest, MultiPlatformKeywordRequest
 from app.ai.providers.factory import get_ai_provider
 from app.ai.prompts.keyword_generation import get_keyword_generation_prompt
+from app.ai.skills.multi_platform_keywords import get_multi_platform_keyword_prompt
 from app.ai.rag.retriever import retrieve_context
 from app.models.analytics import ActivityLog, UsageLog
 
@@ -104,3 +105,100 @@ class KeywordService:
         stmt = stmt.order_by(Keyword.created_at.desc())
         res = await db.execute(stmt)
         return list(res.scalars().all())
+
+    @staticmethod
+    async def generate_multi_platform_keywords(
+        data: MultiPlatformKeywordRequest,
+        org_id: str,
+        user_id: str,
+        db: AsyncSession
+    ) -> dict:
+        ai_provider = await get_ai_provider(org_id=org_id, db=db)
+        brand_voice = None
+        industry = data.industry
+
+        if data.brand_id:
+            b_stmt = select(Brand).where(Brand.id == data.brand_id, Brand.organization_id == org_id)
+            b_res = await db.execute(b_stmt)
+            brand = b_res.scalar_one_or_none()
+            if brand:
+                brand_voice = brand.brand_voice
+                industry = industry or brand.industry
+
+        prompt = get_multi_platform_keyword_prompt(
+            topic=data.topic,
+            industry=industry,
+            target_audience=data.target_audience,
+            business_type=data.business_type,
+            brand_voice=brand_voice
+        )
+
+        try:
+            result = await ai_provider.generate_structured(prompt)
+            # Log activity
+            db.add(ActivityLog(
+                organization_id=org_id,
+                user_id=user_id,
+                action="generated_multi_platform_keywords",
+                entity_type="keyword",
+                details={"topic": data.topic, "seed_count": len(result.get("seed_keywords", []))}
+            ))
+            await db.commit()
+            return result
+        except Exception:
+            return {
+                "offering_name": data.topic,
+                "seed_keywords": [
+                    f"{data.topic.lower()} software",
+                    f"{data.topic.lower()} tools",
+                    f"best {data.topic.lower()}",
+                    f"enterprise {data.topic.lower()}",
+                    f"{data.topic.lower()} platform",
+                    f"{data.topic.lower()} automation",
+                    f"ai {data.topic.lower()}",
+                    f"{data.topic.lower()} solutions"
+                ],
+                "platform_groups": {
+                    "search_engines": [
+                        {"keyword": f"{data.topic.lower()} software", "tag": "V", "notes": "Google Keyword Planner volume"},
+                        {"keyword": f"best {data.topic.lower()} for teams", "tag": "I", "notes": "Commercial intent"}
+                    ],
+                    "generative_ai": [
+                        {"keyword": f"What is the best {data.topic.lower()} for enterprises?", "tag": "I", "notes": "ChatGPT/Perplexity prompt"}
+                    ],
+                    "video_platforms": [
+                        {"keyword": f"{data.topic.lower()} tutorial 2026", "tag": "V", "notes": "YouTube search"}
+                    ],
+                    "social_media": [
+                        {"keyword": f"Why {data.topic.lower()} matters for growth", "tag": "I", "notes": "LinkedIn insight"}
+                    ],
+                    "qa_and_forums": [
+                        {"keyword": f"anyone using {data.topic.lower()} in production?", "tag": "I", "notes": "Reddit community query"}
+                    ],
+                    "news_and_pr": [
+                        {"keyword": f"{data.topic.lower()} market adoption surges", "tag": "I", "notes": "PR trend angle"}
+                    ],
+                    "podcasts_audio": [
+                        {"keyword": f"the future of {data.topic.lower()} with industry founders", "tag": "I", "notes": "Podcast interview"}
+                    ],
+                    "backlink_authority": [
+                        {"keyword": f"ultimate guide to {data.topic.lower()}", "tag": "I", "notes": "Link building asset"}
+                    ]
+                },
+                "top_seed_keywords": [
+                    f"{data.topic.lower()} software",
+                    f"{data.topic.lower()} tools",
+                    f"enterprise {data.topic.lower()}"
+                ],
+                "top_platform_keywords": [
+                    f"best {data.topic.lower()} for enterprise teams",
+                    f"how to implement {data.topic.lower()}"
+                ],
+                "quick_wins": [
+                    {"platform": "Reddit", "opportunity": "Answer niche troubleshooting questions"},
+                    {"platform": "YouTube", "opportunity": "Create a 5-minute setup teardown"}
+                ],
+                "keyword_planner_tip": "Paste the seed keywords into Google Keyword Planner -> click 'Get Results' to get exact search volumes."
+            }
+
+

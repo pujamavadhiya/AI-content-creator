@@ -106,3 +106,4 @@ cd backend
 PYTHONPATH=. ./venv/bin/pytest tests/ -v
 ```
 All 5 test suites pass with 100% coverage across authentication, brand management, reference ingestion, content intelligence, and AI settings.
+

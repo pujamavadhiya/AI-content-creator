@@ -199,3 +199,4 @@ async def test_ai_model_settings_and_credentials(client: AsyncClient, auth_heade
     res_test = await client.post("/api/ai/test-connection", json=test_req, headers=auth_headers)
     assert res_test.status_code == 200
     assert res_test.json()["success"] is True
+

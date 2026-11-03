@@ -101,3 +101,4 @@ class CalendarService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Calendar event not found")
         await db.delete(entry)
         await db.commit()
+

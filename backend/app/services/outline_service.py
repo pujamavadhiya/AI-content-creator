@@ -150,3 +150,4 @@ class OutlineService:
         if not outline:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Content outline not found")
         return outline
+

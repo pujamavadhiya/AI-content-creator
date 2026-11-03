@@ -11,6 +11,43 @@ class KeywordGenerateRequest(BaseModel):
     brand_id: Optional[str] = None
     search_objective: Optional[str] = None
 
+class MultiPlatformKeywordRequest(BaseModel):
+    topic: str
+    industry: Optional[str] = None
+    target_audience: Optional[str] = None
+    business_type: str = "B2B"
+    brand_id: Optional[str] = None
+
+class MultiPlatformKeywordResponse(BaseModel):
+    offering_name: str
+    seed_keywords: List[str]
+    platform_groups: Dict[str, List[Dict[str, Any]]]
+    top_seed_keywords: List[str]
+    top_platform_keywords: List[str]
+    quick_wins: List[Dict[str, str]]
+    keyword_planner_tip: str
+
+class SerpGapRequest(BaseModel):
+    keywords: List[str]
+    niche: str
+    content_type: str = "blog"
+    intent_preference: str = "mixed"
+    language: str = "English"
+
+class SerpGapResponse(BaseModel):
+    niche: str
+    keywords: List[str]
+    ai_overview_summary: str
+    competitor_landscape: List[Dict[str, Any]]
+    common_topics: List[Dict[str, Any]]
+    unique_angles: List[Dict[str, Any]]
+    content_gaps: List[Dict[str, Any]]
+    vague_generic_content_to_replace: List[Dict[str, Any]]
+    recommended_unique_additions: List[Dict[str, Any]]
+    statistics: List[Dict[str, Any]]
+    hard_numbers: List[Dict[str, Any]]
+    people_also_ask: List[Dict[str, Any]]
+
 class KeywordResponse(BaseModel):
     id: str
     keyword: str
@@ -124,3 +161,4 @@ class OutlineResponse(BaseModel):
 
     class Config:
         from_attributes = True
+

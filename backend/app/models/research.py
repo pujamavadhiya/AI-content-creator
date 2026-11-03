@@ -84,3 +84,4 @@ class ContentOutline(TimeStampedModel):
 
     topic = relationship("Topic", back_populates="outlines")
     contents = relationship("GeneratedContent", back_populates="outline")
+

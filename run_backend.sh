@@ -28,3 +28,4 @@ echo "Tip: Press Ctrl+C (not Ctrl+Z) to stop the server."
 echo "---------------------------------------------------------"
 
 exec uvicorn app.main:app --host 127.0.0.1 --port $PORT --reload
+

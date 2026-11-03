@@ -25,3 +25,4 @@ class TrainingDataset(TimeStampedModel):
     example_count = Column(Integer, default=0, nullable=False)
     jsonl_file_path = Column(String(1000), nullable=True)
     status = Column(String(50), default="ready", nullable=False)  # ready, exporting, exported, archived
+

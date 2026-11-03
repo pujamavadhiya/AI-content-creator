@@ -119,3 +119,4 @@ class ParserService:
             return cls.parse_text_file(file_path)
         else:
             return cls.parse_text_file(file_path)
+

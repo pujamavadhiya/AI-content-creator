@@ -234,3 +234,88 @@ export interface AIProviderInfo {
   key_hint?: string;
   last_tested_at?: string;
 }
+
+export interface HumanToneAuditResult {
+  score: number;
+  passes_human_test: boolean;
+  total_violations: number;
+  banned_words_found: string[];
+  banned_phrases_found: string[];
+  uncontracted_forms_found: string[];
+  cliche_opener_detected: boolean;
+  summary_conclusion_detected: boolean;
+  suggested_replacements: Record<string, string>;
+}
+
+export interface PlatformKeywordItem {
+  keyword: string;
+  tag: 'V' | 'I' | 'E';
+  notes?: string;
+}
+
+export interface MultiPlatformKeywordResult {
+  offering_name: string;
+  seed_keywords: string[];
+  platform_groups: {
+    search_engines: PlatformKeywordItem[];
+    generative_ai: PlatformKeywordItem[];
+    video_platforms: PlatformKeywordItem[];
+    social_media: PlatformKeywordItem[];
+    qa_and_forums: PlatformKeywordItem[];
+    news_and_pr: PlatformKeywordItem[];
+    podcasts_audio: PlatformKeywordItem[];
+    backlink_authority: PlatformKeywordItem[];
+  };
+  top_seed_keywords: string[];
+  top_platform_keywords: string[];
+  quick_wins: { platform: string; opportunity: string }[];
+  keyword_planner_tip: string;
+}
+
+export interface SerpGapResult {
+  niche: string;
+  keywords: string[];
+  ai_overview_summary: string;
+  competitor_landscape: {
+    keyword: string;
+    rank: number;
+    page_title: string;
+    url: string;
+    brand: string;
+    primary_angle: string;
+  }[];
+  common_topics: { topic: string; frequency: string }[];
+  unique_angles: { brand_or_url: string; unique_coverage: string }[];
+  content_gaps: { gap_area: string; why_it_matters: string }[];
+  vague_generic_content_to_replace: { competitor_claim: string; flaw: string; how_we_fix: string }[];
+  recommended_unique_additions: { addition: string; source_rationale: string }[];
+  statistics: { stat: string; source_name: string; source_url: string; year: string }[];
+  hard_numbers: { number: string; metric_type: string; source_name: string; source_url: string }[];
+  people_also_ask: { question: string; intent: string; source_or_rationale: string }[];
+}
+
+export interface UrlRewriteResult {
+  url: string;
+  primary_keyword: string;
+  before_diagnosis: {
+    current_title?: string;
+    current_meta?: string;
+    current_h1?: string;
+    word_count?: number;
+    identified_gaps?: string[];
+    schema_status?: string;
+  };
+  whats_changing_and_why: string[];
+  replacement_content: {
+    new_title_tag: string;
+    new_meta_description: string;
+    new_h1: string;
+    body_markdown: string;
+    comparison_table_markdown?: string;
+    faq_items?: { question: string; answer: string }[];
+    recommended_schema_json?: any;
+    internal_links_to_add?: { anchor_text: string; target_topic: string }[];
+    author_attribution: string;
+  };
+}
+

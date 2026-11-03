@@ -34,3 +34,4 @@ class ConnectionTestResponse(BaseModel):
     success: bool
     message: str
     model: str
+

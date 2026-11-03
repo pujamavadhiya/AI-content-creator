@@ -6,7 +6,8 @@ from app.models.auth import User
 from app.core.dependencies import get_current_user, require_role
 from app.schemas.content import (
     BlogGenerateRequest, SocialGenerateRequest, MultiPlatformGenerateRequest,
-    RewriteRequest, ContentUpdate, ContentResponse, EvaluationResponse
+    RewriteRequest, ContentUpdate, ContentResponse, EvaluationResponse,
+    HumanToneAuditRequest, HumanToneAuditResponse, UrlRewriteRequest, UrlRewriteResponse
 )
 from app.services.content_service import ContentService
 from app.services.quality_service import QualityService
@@ -48,6 +49,23 @@ async def rewrite_text(
     db: AsyncSession = Depends(get_db)
 ):
     return await ContentService.rewrite_text(data, current_user.organization_id, db)
+
+@router.post("/human-audit", response_model=HumanToneAuditResponse)
+async def audit_human_tone_endpoint(
+    data: HumanToneAuditRequest,
+    current_user: User = Depends(get_current_user)
+):
+    result = ContentService.audit_text(data.text)
+    return HumanToneAuditResponse.model_validate(result)
+
+@router.post("/url-rewrite", response_model=UrlRewriteResponse)
+async def rewrite_url_content_endpoint(
+    data: UrlRewriteRequest,
+    current_user: User = Depends(require_role(["super_admin", "admin", "editor", "writer"])),
+    db: AsyncSession = Depends(get_db)
+):
+    result = await ContentService.rewrite_url_content(data, current_user.organization_id, db)
+    return UrlRewriteResponse.model_validate(result)
 
 @router.post("/{content_id}/evaluate", response_model=EvaluationResponse)
 async def evaluate_content(
@@ -168,3 +186,4 @@ async def export_all_metadata(
         media_type=media_type,
         headers={"Content-Disposition": f'attachment; filename="{filename}"'}
     )
+

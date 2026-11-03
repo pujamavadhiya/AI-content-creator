@@ -44,3 +44,4 @@ async def delete_calendar_event(
     db: AsyncSession = Depends(get_db)
 ):
     await CalendarService.delete_event(event_id, current_user.organization_id, db)
+

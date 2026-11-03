@@ -5,11 +5,11 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   PenTool, Sparkles, Download, CheckCircle2, ShieldCheck,
-  FileText, Wand2, RefreshCw, Undo, Save, ExternalLink
+  FileText, Wand2, RefreshCw, Undo, Save, ExternalLink, AlertTriangle
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { apiClient } from '@/lib/api';
-import { GeneratedContent, ContentOutline } from '@/types';
+import { GeneratedContent, ContentOutline, HumanToneAuditResult } from '@/types';
 
 function BlogWriterContent() {
   const searchParams = useSearchParams();
@@ -29,9 +29,13 @@ function BlogWriterContent() {
 
   // AI In-line Editing Tools
   const [selectedText, setSelectedText] = useState('');
-  const [aiAction, setAiAction] = useState('rewrite');
+  const [aiAction, setAiAction] = useState('human_tone');
   const [customAiPrompt, setCustomAiPrompt] = useState('');
   const [runningAiTool, setRunningAiTool] = useState(false);
+
+  // Human Tone Audit Skill
+  const [humanAudit, setHumanAudit] = useState<HumanToneAuditResult | null>(null);
+  const [auditing, setAuditing] = useState(false);
 
   // States
   const [generating, setGenerating] = useState(false);
@@ -76,6 +80,27 @@ function BlogWriterContent() {
       showToast(err.response?.data?.detail || 'Blog generation failed', 'error');
     } finally {
       setGenerating(false);
+    }
+  };
+
+  const handleAuditHumanTone = async () => {
+    if (!body) {
+      showToast('Write or generate an article first to audit', 'error');
+      return;
+    }
+    setAuditing(true);
+    try {
+      const res = await apiClient.auditHumanTone(body);
+      setHumanAudit(res);
+      if (res.passes_human_test) {
+        showToast('Passed! 100% human-tone compliant (zero banned words)', 'success');
+      } else {
+        showToast(`Audit flagged ${res.total_violations} AI tells/banned words`, 'info');
+      }
+    } catch (e) {
+      showToast('Failed to run human tone audit', 'error');
+    } finally {
+      setAuditing(false);
     }
   };
 
@@ -240,6 +265,7 @@ function BlogWriterContent() {
                 value={aiAction}
                 onChange={(e) => setAiAction(e.target.value)}
               >
+                <option value="human_tone">Human-Tone Rewrite (Eliminate AI Tells)</option>
                 <option value="rewrite">Rewrite for Clarity</option>
                 <option value="grammar">Fix Grammar & Syntax</option>
                 <option value="professional">Make More Professional</option>
@@ -275,6 +301,66 @@ function BlogWriterContent() {
               <Wand2 size={14} />
               <span>{runningAiTool ? 'Applying AI Edit...' : selectedText ? 'Apply to Selection' : 'Apply to Draft'}</span>
             </button>
+          </div>
+
+          {/* Anti-AI Human Tone Auditor Card */}
+          <div style={{ background: 'white', borderRadius: 12, border: '1px solid #e2e8f0', padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <ShieldCheck size={16} color="#10b981" />
+                <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>Human-Tone Auditor</h3>
+              </div>
+              {humanAudit && (
+                <span className={humanAudit.passes_human_test ? 'badge badge-success' : 'badge badge-warning'}>
+                  {humanAudit.score}% Human
+                </span>
+              )}
+            </div>
+            <p style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: 12 }}>
+              Audits against banned corporate verbs, adjectives, transitions, and AI symmetry rules.
+            </p>
+
+            <button
+              onClick={handleAuditHumanTone}
+              disabled={auditing || !body}
+              className="btn-secondary"
+              style={{ width: '100%', fontSize: '0.85rem', padding: '8px', marginBottom: 12 }}
+            >
+              <RefreshCw size={14} className={auditing ? 'spin' : ''} />
+              <span>{auditing ? 'Scanning Banned Vocabulary...' : 'Scan Draft for AI Tells'}</span>
+            </button>
+
+            {humanAudit && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: '0.8rem' }}>
+                {humanAudit.passes_human_test ? (
+                  <div style={{ background: '#ecfdf5', padding: 10, borderRadius: 8, color: '#065f46', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <CheckCircle2 size={16} />
+                    <span>Passed! Zero banned words or AI cliches detected.</span>
+                  </div>
+                ) : (
+                  <div style={{ background: '#fffbeb', padding: 10, borderRadius: 8, border: '1px solid #fef3c7' }}>
+                    <div style={{ fontWeight: 700, color: '#b45309', marginBottom: 4 }}>
+                      ⚠️ {humanAudit.total_violations} AI Flags Found
+                    </div>
+                    {humanAudit.banned_words_found?.length > 0 && (
+                      <div style={{ color: '#92400e', marginBottom: 4 }}>
+                        <strong>Banned words:</strong> {humanAudit.banned_words_found.join(', ')}
+                      </div>
+                    )}
+                    {humanAudit.cliche_opener_detected && (
+                      <div style={{ color: '#dc2626', fontSize: '0.75rem' }}>
+                        • Cliche opener detected (e.g. 'In today's fast-paced world')
+                      </div>
+                    )}
+                    {humanAudit.summary_conclusion_detected && (
+                      <div style={{ color: '#dc2626', fontSize: '0.75rem' }}>
+                        • Summary conclusion detected (replace with sharp parting shot)
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Outline Reference Panel */}

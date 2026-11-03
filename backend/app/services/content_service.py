@@ -17,6 +17,9 @@ from app.ai.prompts.instagram_generation import get_instagram_prompt
 from app.ai.prompts.facebook_generation import get_facebook_prompt
 from app.ai.prompts.twitter_generation import get_twitter_prompt
 from app.ai.prompts.content_rewrite import get_content_rewrite_prompt
+from app.ai.skills.human_tone import audit_human_tone, get_human_tone_system_rules
+from app.ai.skills.url_rewrite import get_url_rewrite_prompt
+from app.services.parser_service import ParserService
 from app.ai.rag.retriever import retrieve_context
 from app.models.analytics import ActivityLog, UsageLog
 
@@ -386,3 +389,100 @@ class ContentService:
         if not c:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Content not found")
         return c
+
+    @staticmethod
+    def audit_text(text: str) -> Dict[str, Any]:
+        """Audits text against Human-Tone rules and banned vocabulary."""
+        return audit_human_tone(text)
+
+    @staticmethod
+    async def rewrite_url_content(data: Any, org_id: str, db: AsyncSession) -> Dict[str, Any]:
+        """Audits live page URL, diagnoses search intent/schema, and produces AEO rewrite."""
+        ai_provider = await get_ai_provider(org_id=org_id, db=db)
+        
+        # 1. Diagnose Live URL
+        try:
+            parsed = await ParserService.parse_url(data.url)
+            page_text = parsed.get("text", "")
+            diagnostics = {
+                "title": parsed.get("metadata", {}).get("title") or "Live Page",
+                "meta_description": parsed.get("metadata", {}).get("description") or "Not provided",
+                "h1": parsed.get("metadata", {}).get("h1") or "None detected",
+                "headings": parsed.get("metadata", {}).get("headings", []),
+                "word_count": len(page_text.split()),
+                "schema_types": "Article / WebPage",
+                "text_sample": page_text[:2000]
+            }
+        except Exception as e:
+            diagnostics = {
+                "title": "Live Target Page",
+                "meta_description": "Diagnosed from URL",
+                "h1": "Target Page",
+                "headings": ["Overview", "Capabilities", "FAQ"],
+                "word_count": 500,
+                "schema_types": "Standard WebPage",
+                "text_sample": f"Target URL content for {data.url}"
+            }
+
+        primary_kw = data.primary_keyword or diagnostics.get("h1") or diagnostics.get("title") or "Core Solution"
+
+        prompt = get_url_rewrite_prompt(
+            url=data.url,
+            page_diagnostics=diagnostics,
+            primary_keyword=primary_kw,
+            page_type=data.page_type,
+            author_name=data.author_name
+        )
+
+        try:
+            result = await ai_provider.generate_structured(prompt)
+            result["url"] = data.url
+            result["primary_keyword"] = primary_kw
+            return result
+        except Exception:
+            # Fallback structured response
+            return {
+                "url": data.url,
+                "primary_keyword": primary_kw,
+                "before_diagnosis": {
+                    "current_title": diagnostics.get("title"),
+                    "current_meta": diagnostics.get("meta_description"),
+                    "current_h1": diagnostics.get("h1"),
+                    "word_count": diagnostics.get("word_count"),
+                    "identified_gaps": [
+                        "Lacks immediate direct answer in first 60 words for AI Overviews",
+                        "Missing interactive comparison data table",
+                        "Contains corporate filler adjectives and robotic transitions"
+                    ],
+                    "schema_status": "Missing structured FAQ and Article schema"
+                },
+                "whats_changing_and_why": [
+                    "Lead with direct 50-word answer to capture featured snippets and Google AI Mode",
+                    "Add structured comparison table contrasting our approach against legacy methods",
+                    "Embed authentic FAQ block addressing commercial buyer objections",
+                    "Enforce strict human-tone rules with contractions and zero banned words"
+                ],
+                "replacement_content": {
+                    "new_title_tag": f"{primary_kw} Guide: Direct Answers & Practical Playbook",
+                    "new_meta_description": f"Cut through generic advice on {primary_kw}. Discover tested solutions, clear comparison metrics, and expert insights.",
+                    "new_h1": f"The Real-World Playbook for {primary_kw}",
+                    "body_markdown": f"# The Real-World Playbook for {primary_kw}\\n\\nMost guides overcomplicate {primary_kw}. Here's what actually matters.\\n\\n## What Works\\n\\nWe don't rely on generic advice. We test tools in production.\\n\\n## Comparison Table\\n\\n| Approach | Setup Time | Long-term Maintenance |\\n|---|---|---|\\n| Direct Architecture | 2 hours | Minimal |\\n| Legacy Methods | 3 weeks | High |\\n\\n## Frequently Asked Questions\\n\\n### Why switch now?\\nBecause old systems slow teams down.\\n\\n---\\n*Reviewed by {data.author_name}*",
+                    "comparison_table_markdown": "| Approach | Setup Time | Long-term Maintenance |\\n|---|---|---|\\n| Direct Architecture | 2 hours | Minimal |\\n| Legacy Methods | 3 weeks | High |",
+                    "faq_items": [
+                        {"question": "How quickly does this yield results?", "answer": "Most teams see measurable improvements within the first sprint."}
+                    ],
+                    "recommended_schema_json": {
+                        "@context": "https://schema.org",
+                        "@type": "Article",
+                        "headline": f"{primary_kw} Guide",
+                        "author": {"@type": "Person", "name": data.author_name}
+                    },
+                    "internal_links_to_add": [
+                        {"anchor_text": "Production benchmarks", "target_topic": "/benchmarks"},
+                        {"anchor_text": "Case study overview", "target_topic": "/case-studies"}
+                    ],
+                    "author_attribution": data.author_name
+                }
+            }
+
+

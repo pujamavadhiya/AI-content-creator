@@ -75,3 +75,4 @@ async def get_ai_provider(
         return MockAIProvider(model_name=model_name or "mock-model")
     else:
         raise ValueError(f"Unsupported AI Provider slug: {slug}")
+

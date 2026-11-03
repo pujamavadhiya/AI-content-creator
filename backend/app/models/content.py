@@ -64,3 +64,4 @@ class ContentCalendar(TimeStampedModel):
     notes = Column(Text, nullable=True)
 
     content = relationship("GeneratedContent", back_populates="calendar_entries")
+

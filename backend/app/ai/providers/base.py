@@ -34,3 +34,4 @@ class BaseAIProvider(ABC):
     async def test_connection(self) -> Dict[str, Any]:
         """Verify API key and model connectivity."""
         pass
+

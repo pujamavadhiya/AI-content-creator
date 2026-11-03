@@ -162,3 +162,4 @@ class TopicService:
         stmt = stmt.order_by(Topic.created_at.desc())
         res = await db.execute(stmt)
         return list(res.scalars().all())
+

@@ -153,3 +153,4 @@ class QualityService:
         await db.commit()
         await db.refresh(content)
         return content
+

@@ -38,3 +38,4 @@ async def init_db():
         # Import models so Base metadata is populated
         import app.models # noqa
         await conn.run_sync(Base.metadata.create_all)
+

@@ -62,3 +62,4 @@ async def auth_headers(db_session):
 
     token = create_access_token({"sub": user.id, "org_id": org.id, "role": user.role})
     return {"Authorization": f"Bearer {token}", "X-User-ID": user.id, "X-Org-ID": org.id}
+

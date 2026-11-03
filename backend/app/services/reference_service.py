@@ -172,3 +172,4 @@ class ReferenceService:
             doc.status = "failed"
             doc.error_message = str(e)
             await db.commit()
+
