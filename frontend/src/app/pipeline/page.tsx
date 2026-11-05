@@ -33,7 +33,7 @@ export default function PipelineStudioPage() {
   const [audience, setAudience] = useState('Senior Software Architects and AI Engineers');
   const [wordCount, setWordCount] = useState<number>(1200);
   const [language, setLanguage] = useState('English');
-  const [provider, setProvider] = useState<'gemini' | 'openai' | 'wordnet_local'>('gemini');
+  const [provider, setProvider] = useState<'gemini' | 'openai' | 'claude' | 'wordnet_local'>('gemini');
 
   // 3-Phase Guided Pipeline Workflow States ('outline' | 'draft' | 'final')
   const [pipelinePhase, setPipelinePhase] = useState<'outline' | 'draft' | 'final'>('outline');
@@ -477,7 +477,12 @@ export default function PipelineStudioPage() {
           <div className={styles.modelStatusPill}>
             <span className={styles.indicator}></span>
             <span>
-              <strong>Active Engine:</strong> {provider === 'gemini' ? 'Google Gemini 2.0 / Flash Lite' : 'OpenAI GPT-4o'}
+              <strong>Active Engine:</strong> {
+                provider === 'gemini' ? 'Google Gemini 2.0' :
+                provider === 'openai' ? 'OpenAI GPT-4o' :
+                provider === 'claude' ? 'Anthropic Claude 3.5 Sonnet' :
+                'Local WordNet & PAWS Dataset'
+              }
             </span>
           </div>
 
@@ -615,10 +620,11 @@ export default function PipelineStudioPage() {
               <label>AI Provider</label>
               <select
                 value={provider}
-                onChange={(e) => setProvider(e.target.value as 'gemini' | 'openai' | 'wordnet_local')}
+                onChange={(e) => setProvider(e.target.value as 'gemini' | 'openai' | 'claude' | 'wordnet_local')}
               >
                 <option value="gemini">Google Gemini + WordNet Engine</option>
                 <option value="openai">OpenAI GPT-4o + WordNet Engine</option>
+                <option value="claude">Anthropic Claude 3.5 Sonnet + WordNet Engine</option>
                 <option value="wordnet_local">🏷️ WordNet & PAWS Model (100% Offline / Local Dataset)</option>
               </select>
             </div>

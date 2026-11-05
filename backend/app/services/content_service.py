@@ -31,7 +31,7 @@ class ContentService:
         user_id: str,
         db: AsyncSession
     ) -> GeneratedContent:
-        ai_provider = await get_ai_provider(org_id=org_id, db=db)
+        ai_provider = await get_ai_provider(provider_slug=getattr(data, "provider", None), org_id=org_id, db=db)
 
         # Brand context
         brand_voice = "Professional & Authoritative"
@@ -173,7 +173,7 @@ class ContentService:
         user_id: str,
         db: AsyncSession
     ) -> GeneratedContent:
-        ai_provider = await get_ai_provider(org_id=org_id, db=db)
+        ai_provider = await get_ai_provider(provider_slug=getattr(data, "provider", None), org_id=org_id, db=db)
 
         brand_voice = "Engaging & Insightful"
         target_audience = "Social Community"
@@ -301,7 +301,8 @@ class ContentService:
                     collection_id=data.collection_id,
                     topic_id=data.topic_id,
                     topic_title=data.topic_title,
-                    desired_word_count=1200
+                    desired_word_count=1200,
+                    provider=data.provider
                 )
                 res = await ContentService.generate_blog(blog_req, org_id, user_id, db)
                 results.append(res)
@@ -312,7 +313,8 @@ class ContentService:
                     topic_id=data.topic_id,
                     topic_title=data.topic_title,
                     platform=p_clean,
-                    format_type="thought_leadership" if p_clean == "linkedin" else "carousel" if p_clean == "instagram" else "thread" if p_clean == "twitter" else "business_post"
+                    format_type="thought_leadership" if p_clean == "linkedin" else "carousel" if p_clean == "instagram" else "thread" if p_clean == "twitter" else "business_post",
+                    provider=data.provider
                 )
                 res = await ContentService.generate_social(soc_req, org_id, user_id, db)
                 results.append(res)
@@ -321,7 +323,7 @@ class ContentService:
 
     @staticmethod
     async def rewrite_text(data: RewriteRequest, org_id: str, db: AsyncSession) -> Dict[str, str]:
-        ai_provider = await get_ai_provider(org_id=org_id, db=db)
+        ai_provider = await get_ai_provider(provider_slug=getattr(data, "provider", None), org_id=org_id, db=db)
         prompt = get_content_rewrite_prompt(
             selected_text=data.selected_text,
             action=data.action,
@@ -410,7 +412,7 @@ class ContentService:
     @staticmethod
     async def rewrite_url_content(data: Any, org_id: str, db: AsyncSession) -> Dict[str, Any]:
         """Audits live page URL, diagnoses search intent/schema, and produces AEO rewrite."""
-        ai_provider = await get_ai_provider(org_id=org_id, db=db)
+        ai_provider = await get_ai_provider(provider_slug=getattr(data, "provider", None), org_id=org_id, db=db)
         
         # 1. Diagnose Live URL
         try:

@@ -16,6 +16,7 @@ class BlogGenerateRequest(BaseModel):
     cta_style: Optional[str] = None
     compulsory_keywords: Optional[str] = None  # Compulsory keywords (one per line or comma-separated)
     mandatory_keywords: Optional[List[str]] = None
+    provider: Optional[str] = None
 
 class SocialGenerateRequest(BaseModel):
     brand_id: Optional[str] = None
@@ -27,6 +28,7 @@ class SocialGenerateRequest(BaseModel):
     tone: Optional[str] = "Conversational & Authoritative"
     slides_count: Optional[int] = 7  # for instagram carousel
     tweets_count: Optional[int] = 8  # for twitter thread
+    provider: Optional[str] = None
 
 class MultiPlatformGenerateRequest(BaseModel):
     brand_id: Optional[str] = None
@@ -34,6 +36,7 @@ class MultiPlatformGenerateRequest(BaseModel):
     topic_id: Optional[str] = None
     topic_title: str
     platforms: List[str] = ["blog", "linkedin", "instagram", "facebook", "twitter"]
+    provider: Optional[str] = None
 
 class RewriteRequest(BaseModel):
     content_id: Optional[str] = None
@@ -42,6 +45,7 @@ class RewriteRequest(BaseModel):
     custom_instruction: Optional[str] = None
     tone: Optional[str] = None
     language: Optional[str] = None
+    provider: Optional[str] = None
 
 class HumanToneAuditRequest(BaseModel):
     text: str
@@ -113,6 +117,7 @@ class UrlRewriteRequest(BaseModel):
     primary_keyword: Optional[str] = None
     page_type: str = "blog"  # blog, service, landing
     author_name: str = "Ashok Rathod - Tech Consultant"
+    provider: Optional[str] = None
 
 class UrlRewriteResponse(BaseModel):
     url: str

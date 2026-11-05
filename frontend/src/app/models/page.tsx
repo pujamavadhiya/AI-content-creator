@@ -336,7 +336,7 @@ export default function AIModelsPage() {
             <input
               type="password"
               style={{ width: '100%', fontSize: '0.9rem', fontFamily: 'monospace' }}
-              placeholder={selectedSlug === 'gemini' ? 'AIzaSy...' : 'sk-...'}
+              placeholder={selectedSlug === 'gemini' ? 'AIzaSy...' : selectedSlug === 'claude' ? 'sk-ant-api03-...' : 'sk-proj-...'}
               value={apiKeyInput}
               onChange={(e) => setApiKeyInput(e.target.value)}
               required

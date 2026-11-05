@@ -48,6 +48,7 @@ function BlogWriterContent() {
   const [generatingArticle, setGeneratingArticle] = useState(false);
   const [paraphrasing, setParaphrasing] = useState(false);
   const [sanitizingSymbols, setSanitizingSymbols] = useState(false);
+  const [contentProvider, setContentProvider] = useState<'gemini' | 'openai' | 'claude'>('gemini');
   const [paraphraseModel, setParaphraseModel] = useState<'wordnet_local' | 'gemini' | 'openai' | 'claude'>('wordnet_local');
   const [replacingBannedWords, setReplacingBannedWords] = useState(false);
   const [plagiarismRisk, setPlagiarismRisk] = useState<string | null>(null);
@@ -103,6 +104,7 @@ function BlogWriterContent() {
         brand_id: activeBrand?.id,
         collection_id: activeCollection?.id,
         compulsory_keywords: compulsoryKeywords || undefined,
+        provider: contentProvider,
       });
       setContentId(generated.id);
       setTitle(generated.title);
@@ -130,6 +132,7 @@ function BlogWriterContent() {
         draft: draftText,
         mode: 'blog',
         compulsory_keywords: compulsoryKeywords || undefined,
+        provider: contentProvider,
         project_context: {
           word_count: wordCountTarget,
           primary_keyword: title || 'Industry Strategy',
@@ -170,6 +173,7 @@ function BlogWriterContent() {
         draft: draftText,
         mode: 'article',
         compulsory_keywords: compulsoryKeywords || undefined,
+        provider: contentProvider,
         project_context: {
           word_count: Math.max(wordCountTarget, 1800),
           primary_keyword: title || 'Strategic Architecture',
@@ -446,6 +450,7 @@ function BlogWriterContent() {
         selected_text: textToModify,
         action: aiAction,
         custom_instruction: customAiPrompt || undefined,
+        provider: contentProvider,
       });
 
       if (selectedText.trim()) {
@@ -547,6 +552,29 @@ function BlogWriterContent() {
               {w}w
             </button>
           ))}
+        </div>
+
+        {/* AI Engine Provider Selector */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', background: '#f8fafc', padding: '4px 10px', borderRadius: 8, border: '1px solid #e2e8f0' }}>
+          <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#475569' }}>Engine:</span>
+          <select
+            value={contentProvider}
+            onChange={(e) => setContentProvider(e.target.value as 'gemini' | 'openai' | 'claude')}
+            style={{
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              padding: '4px 8px',
+              borderRadius: 6,
+              border: '1px solid #cbd5e1',
+              background: '#ffffff',
+              color: '#0f172a',
+              cursor: 'pointer',
+            }}
+          >
+            <option value="gemini">Google Gemini 2.0</option>
+            <option value="openai">OpenAI GPT-4o</option>
+            <option value="claude">Anthropic Claude 3.5</option>
+          </select>
         </div>
 
         {/* 3 Core Action Buttons: Draft -> Generate Blog -> Generate Article */}

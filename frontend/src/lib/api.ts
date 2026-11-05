@@ -191,22 +191,22 @@ export const apiClient = {
   },
 
   // --- Content Generation ---
-  generateBlog: async (payload: { outline_id?: string; topic_title?: string; desired_word_count?: number; writing_tone?: string; brand_id?: string; collection_id?: string; compulsory_keywords?: string }): Promise<GeneratedContent> => {
+  generateBlog: async (payload: { outline_id?: string; topic_title?: string; desired_word_count?: number; writing_tone?: string; brand_id?: string; collection_id?: string; compulsory_keywords?: string; provider?: string }): Promise<GeneratedContent> => {
     const res = await api.post('/api/content/generate-blog', payload);
     return res.data;
   },
 
-  generateSocial: async (payload: { topic_title?: string; platform: string; format_type: string; brand_id?: string; collection_id?: string }): Promise<GeneratedContent> => {
+  generateSocial: async (payload: { topic_title?: string; platform: string; format_type: string; brand_id?: string; collection_id?: string; provider?: string }): Promise<GeneratedContent> => {
     const res = await api.post('/api/content/generate-social', payload);
     return res.data;
   },
 
-  generateMultiPlatform: async (payload: { topic_title: string; platforms: string[]; brand_id?: string; collection_id?: string }): Promise<GeneratedContent[]> => {
+  generateMultiPlatform: async (payload: { topic_title: string; platforms: string[]; brand_id?: string; collection_id?: string; provider?: string }): Promise<GeneratedContent[]> => {
     const res = await api.post('/api/content/generate-multiple', payload);
     return res.data;
   },
 
-  rewriteText: async (payload: { selected_text: string; action: string; tone?: string; custom_instruction?: string }): Promise<{ revised_text: string }> => {
+  rewriteText: async (payload: { selected_text: string; action: string; tone?: string; custom_instruction?: string; provider?: string }): Promise<{ revised_text: string }> => {
     const res = await api.post('/api/content/rewrite', payload);
     return res.data;
   },
