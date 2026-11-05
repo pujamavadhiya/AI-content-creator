@@ -68,3 +68,4 @@ async def test_content_schemas_accept_provider():
 
     rewrite_req = RewriteRequest(selected_text="We utilize AI.", action="simplify", provider="claude")
     assert rewrite_req.provider == "claude"
+

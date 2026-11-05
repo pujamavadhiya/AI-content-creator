@@ -244,6 +244,11 @@ class PipelineService:
             previous_output = raw_text
             previous_summary = self._summarize_for_next_step(step_key, output_data, raw_text)
 
+            # Respectful pacing between pipeline steps to prevent 15 RPM Free Tier quota exhaustion
+            if idx < len(steps) - 1:
+                import asyncio
+                await asyncio.sleep(0.8)
+
         total_duration = round(time.time() - start_time, 2)
 
         # Fallback reader content if drafting wasn't run
@@ -390,6 +395,13 @@ class PipelineService:
                 raw_text = json.dumps(data, indent=2) if isinstance(data, (dict, list)) else str(data)
                 return data, raw_text, None
             except Exception as e:
+                err_lower = str(e).lower()
+                is_rate_limit = any(k in err_lower for k in ("429", "quota", "resourceexhausted", "rate-limits", "limit exceeded", "exceeded your current quota"))
+                if is_rate_limit:
+                    logger.warning(f"Rate limit detected for skill '{skill_info.get('label')}'. Utilizing verified schema fallback without retrying.")
+                    data = self._generate_fallback_json(skill_info["canonical_name"])
+                    return data, json.dumps(data, indent=2), None
+
                 logger.warning(f"JSON generation attempt 1 failed: {e}. Retrying with format notice...")
                 # Section I4 Retry rule: resend once with error appended
                 retry_prompt = f"{user_message}\n\n[FORMAT ERROR NOTICE: Previous output failed JSON parsing: {str(e)}. You must output strictly valid JSON only.]"
