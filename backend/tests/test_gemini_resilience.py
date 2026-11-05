@@ -51,3 +51,4 @@ async def test_gemini_model_rotation_on_429():
         result = await provider.generate_structured("test prompt")
         assert result["success"] is True
         assert call_counts["count"] == 2
+

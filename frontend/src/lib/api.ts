@@ -4,7 +4,7 @@ import {
   Topic, TopicCluster, ContentOutline, GeneratedContent,
   ContentEvaluation, CalendarEvent, AnalyticsSummary,
   AIProviderInfo, User, HumanToneAuditResult, MultiPlatformKeywordResult,
-  SerpGapResult, UrlRewriteResult, ParaphraseHumanizeResponse
+  SerpGapResult, UrlRewriteResult, ParaphraseHumanizeResponse, ContentVersion
 } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
@@ -198,6 +198,46 @@ export const apiClient = {
 
   generateSocial: async (payload: { topic_title?: string; platform: string; format_type: string; brand_id?: string; collection_id?: string; provider?: string }): Promise<GeneratedContent> => {
     const res = await api.post('/api/content/generate-social', payload);
+    return res.data;
+  },
+
+  socialChatRefine: async (payload: {
+    content_id?: string;
+    platform: string;
+    current_content: string;
+    instruction: string;
+    conversation_history?: Array<{ role: 'user' | 'assistant'; content: string }>;
+    provider?: string;
+    brand_id?: string;
+  }): Promise<{
+    success: boolean;
+    refined_content: string;
+    change_summary: string;
+    version_number: number;
+    content_id?: string;
+    previous_content: string;
+    platform: string;
+    word_count: number;
+    character_count: number;
+  }> => {
+    const res = await api.post('/api/content/social-chat-refine', payload);
+    return res.data;
+  },
+
+  getContentVersions: async (contentId: string): Promise<ContentVersion[]> => {
+    const res = await api.get(`/api/content/${contentId}/versions`);
+    return res.data;
+  },
+
+  restoreContentVersion: async (contentId: string, versionNumber: number): Promise<{
+    success: boolean;
+    content_id: string;
+    restored_version_number: number;
+    new_version_number: number;
+    active_body: string;
+    active_title: string;
+  }> => {
+    const res = await api.post(`/api/content/${contentId}/restore-version/${versionNumber}`);
     return res.data;
   },
 

@@ -10,7 +10,9 @@ from app.schemas.content import (
     HumanToneAuditRequest, HumanToneAuditResponse, UrlRewriteRequest, UrlRewriteResponse,
     ParaphraseHumanizeRequest, ParaphraseHumanizeResponse,
     SanitizeSymbolsRequest, SanitizeSymbolsResponse,
-    ReplaceBannedWordsRequest, ReplaceBannedWordsResponse
+    ReplaceBannedWordsRequest, ReplaceBannedWordsResponse,
+    SocialChatRefineRequest, SocialChatRefineResponse, ContentVersionResponse,
+    RestoreVersionResponse
 )
 from app.services.content_service import ContentService
 from app.services.quality_service import QualityService
@@ -37,6 +39,45 @@ async def generate_social(
 ):
     content = await ContentService.generate_social(data, current_user.organization_id, current_user.id, db)
     return ContentResponse.model_validate(content)
+
+@router.post("/social-chat-refine", response_model=SocialChatRefineResponse)
+async def social_chat_refine_endpoint(
+    data: SocialChatRefineRequest,
+    current_user: User = Depends(require_role(["super_admin", "admin", "editor", "writer"])),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Conversational instruction-driven refinement for Social Media Studio.
+    Modifies previous content based on user instructions and chat history,
+    generating revised versions sequentially while preserving history.
+    """
+    result = await ContentService.social_chat_refine(data, current_user.organization_id, current_user.id, db)
+    return SocialChatRefineResponse.model_validate(result)
+
+@router.get("/{content_id}/versions", response_model=List[ContentVersionResponse])
+async def get_content_versions_endpoint(
+    content_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Fetch all historical versions for a content item.
+    """
+    versions = await ContentService.get_content_versions(content_id, current_user.organization_id, db)
+    return [ContentVersionResponse.model_validate(v) for v in versions]
+
+@router.post("/{content_id}/restore-version/{version_number}", response_model=RestoreVersionResponse)
+async def restore_content_version_endpoint(
+    content_id: str,
+    version_number: int,
+    current_user: User = Depends(require_role(["super_admin", "admin", "editor", "writer"])),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Restores a historical version to become the active content.
+    """
+    result = await ContentService.restore_version(content_id, version_number, current_user.organization_id, current_user.id, db)
+    return RestoreVersionResponse.model_validate(result)
 
 @router.post("/generate-multiple", response_model=List[ContentResponse], status_code=status.HTTP_201_CREATED)
 async def generate_multi_platform(

@@ -184,6 +184,17 @@ export interface GeneratedContent {
   updated_at: string;
 }
 
+export interface ContentVersion {
+  id: string;
+  content_id: string;
+  version_number: number;
+  title: string;
+  body: string;
+  change_summary?: string;
+  created_by?: string;
+  created_at: string;
+}
+
 export interface ContentEvaluation {
   id: string;
   content_id: string;

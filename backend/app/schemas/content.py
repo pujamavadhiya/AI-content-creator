@@ -180,3 +180,32 @@ class EvaluationResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class SocialChatRefineRequest(BaseModel):
+    content_id: Optional[str] = None
+    platform: str = "linkedin"
+    current_content: str
+    instruction: str
+    conversation_history: Optional[List[Dict[str, str]]] = None
+    provider: Optional[str] = None
+    brand_id: Optional[str] = None
+
+class SocialChatRefineResponse(BaseModel):
+    success: bool
+    refined_content: str
+    change_summary: str
+    version_number: int
+    content_id: Optional[str] = None
+    previous_content: str
+    platform: str
+    word_count: int
+    character_count: int
+
+class RestoreVersionResponse(BaseModel):
+    success: bool
+    content_id: str
+    restored_version_number: int
+    new_version_number: int
+    active_body: str
+    active_title: str
+
+

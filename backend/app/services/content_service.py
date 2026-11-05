@@ -8,7 +8,7 @@ from app.models.research import ContentOutline, Topic
 from app.models.brand import Brand, BrandGuideline
 from app.schemas.content import (
     BlogGenerateRequest, SocialGenerateRequest, MultiPlatformGenerateRequest,
-    RewriteRequest, ContentUpdate
+    RewriteRequest, ContentUpdate, SocialChatRefineRequest
 )
 from app.ai.providers.factory import get_ai_provider
 from app.ai.prompts.blog_generation import get_blog_generation_prompt
@@ -498,5 +498,209 @@ class ContentService:
                     "author_attribution": data.author_name
                 }
             }
+
+    @staticmethod
+    async def social_chat_refine(
+        data: SocialChatRefineRequest,
+        org_id: str,
+        user_id: str,
+        db: AsyncSession
+    ) -> Dict[str, Any]:
+        """
+        Conversational instruction-driven refinement for Social Media Studio.
+        Modifies previous content based on user instructions and chat history,
+        preserving historical versions so any prior version can be restored.
+        """
+        ai_provider = await get_ai_provider(provider_slug=data.provider, org_id=org_id, db=db)
+        
+        # 1. Resolve Brand Voice if brand_id provided
+        brand_voice = "Engaging, authoritative, and platform-native"
+        if data.brand_id:
+            b_stmt = select(Brand).where(Brand.id == data.brand_id, Brand.organization_id == org_id)
+            b_res = await db.execute(b_stmt)
+            brand = b_res.scalar_one_or_none()
+            if brand:
+                brand_voice = brand.brand_voice or brand_voice
+
+        # 2. Build conversational system prompt
+        platform_name = data.platform.capitalize()
+        system_instruction = (
+            f"You are an elite {platform_name} Content Strategist and Copywriter.\n"
+            f"Your mission is to iteratively refine the user's social post according to their exact chat instructions.\n"
+            f"Rules for {platform_name}:\n"
+            f"- Preserve the core factual substance and tone unless instructed to change it.\n"
+            f"- Apply the requested changes with high craft (hooks, pacing, line breaks, formatting).\n"
+            f"- Follow Brand Voice: {brand_voice}.\n"
+            f"- Output strictly the updated social post text without conversational framing (do NOT say 'Here is your revised post:'). Just output the ready-to-publish social copy."
+        )
+
+        # 3. Build user prompt including context and prior conversation
+        history_context = ""
+        if data.conversation_history:
+            recent_msgs = data.conversation_history[-4:]
+            formatted_history = []
+            for m in recent_msgs:
+                role_label = "User Instruction" if m.get("role") == "user" else "Assistant Content Version"
+                formatted_history.append(f"[{role_label}]:\n{m.get('content', '')}")
+            history_context = "\n\n--- PREVIOUS REVISION CONTEXT ---\n" + "\n\n".join(formatted_history)
+
+        prompt = (
+            f"CURRENT {platform_name.upper()} CONTENT TO MODIFY:\n"
+            f"\"\"\"\n{data.current_content}\n\"\"\"\n"
+            f"{history_context}\n\n"
+            f"USER MODIFICATION INSTRUCTION:\n"
+            f"{data.instruction}\n\n"
+            f"Generate the revised {platform_name} post now strictly incorporating the user's instructions:"
+        )
+
+        # 4. Generate modified content
+        refined_text = await ai_provider.generate_text(
+            prompt=prompt,
+            system_instruction=system_instruction,
+            temperature=0.6,
+            max_tokens=2048
+        )
+        refined_text = refined_text.strip()
+        # Clean any accidental wrapping markdown quotes
+        if refined_text.startswith('"""') and refined_text.endswith('"""'):
+            refined_text = refined_text[3:-3].strip()
+
+        # 5. Version Tracking & Persistence
+        version_num = 2
+        content_obj = None
+
+        if data.content_id:
+            c_stmt = select(GeneratedContent).where(
+                GeneratedContent.id == data.content_id,
+                GeneratedContent.organization_id == org_id
+            )
+            c_res = await db.execute(c_stmt)
+            content_obj = c_res.scalar_one_or_none()
+            if content_obj:
+                # Find current highest version number
+                v_stmt = select(ContentVersion).where(
+                    ContentVersion.content_id == content_obj.id
+                ).order_by(ContentVersion.version_number.desc())
+                v_res = await db.execute(v_stmt)
+                latest_v = v_res.scalar_one_or_none()
+                version_num = (latest_v.version_number + 1) if latest_v else 2
+
+                # Update active content body
+                content_obj.body = refined_text
+                content_obj.word_count = len(refined_text.split())
+                content_obj.character_count = len(refined_text)
+
+                # Create version entry preserving previous state
+                new_v = ContentVersion(
+                    content_id=content_obj.id,
+                    version_number=version_num,
+                    title=content_obj.title,
+                    body=refined_text,
+                    change_summary=data.instruction[:200],
+                    created_by=user_id
+                )
+                db.add(new_v)
+                await db.commit()
+                await db.refresh(content_obj)
+
+        return {
+            "success": True,
+            "refined_content": refined_text,
+            "change_summary": data.instruction,
+            "version_number": version_num,
+            "content_id": data.content_id,
+            "previous_content": data.current_content,
+            "platform": data.platform,
+            "word_count": len(refined_text.split()),
+            "character_count": len(refined_text),
+        }
+
+    @staticmethod
+    async def restore_version(
+        content_id: str,
+        version_number: int,
+        org_id: str,
+        user_id: str,
+        db: AsyncSession
+    ) -> Dict[str, Any]:
+        """
+        Restores a past ContentVersion to become the active GeneratedContent.body.
+        Also records a new version pointing to this restoration event so full history is preserved.
+        """
+        c_stmt = select(GeneratedContent).where(
+            GeneratedContent.id == content_id,
+            GeneratedContent.organization_id == org_id
+        )
+        c_res = await db.execute(c_stmt)
+        content_obj = c_res.scalar_one_or_none()
+        if not content_obj:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Content not found")
+
+        v_stmt = select(ContentVersion).where(
+            ContentVersion.content_id == content_id,
+            ContentVersion.version_number == version_number
+        )
+        v_res = await db.execute(v_stmt)
+        target_v = v_res.scalar_one_or_none()
+        if not target_v:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Version {version_number} not found")
+
+        # Find latest version number to create a new restored version entry
+        lv_stmt = select(ContentVersion).where(
+            ContentVersion.content_id == content_id
+        ).order_by(ContentVersion.version_number.desc())
+        lv_res = await db.execute(lv_stmt)
+        latest_v = lv_res.scalar_one_or_none()
+        next_v_num = (latest_v.version_number + 1) if latest_v else (version_number + 1)
+
+        # Update active content
+        content_obj.body = target_v.body
+        content_obj.title = target_v.title
+        content_obj.word_count = len(target_v.body.split())
+        content_obj.character_count = len(target_v.body)
+
+        # Create restoration version entry
+        restored_v = ContentVersion(
+            content_id=content_obj.id,
+            version_number=next_v_num,
+            title=target_v.title,
+            body=target_v.body,
+            change_summary=f"Restored from Version {version_number}",
+            created_by=user_id
+        )
+        db.add(restored_v)
+        await db.commit()
+        await db.refresh(content_obj)
+
+        return {
+            "success": True,
+            "content_id": content_id,
+            "restored_version_number": version_number,
+            "new_version_number": next_v_num,
+            "active_body": target_v.body,
+            "active_title": target_v.title,
+        }
+
+    @staticmethod
+    async def get_content_versions(
+        content_id: str,
+        org_id: str,
+        db: AsyncSession
+    ) -> List[ContentVersion]:
+        """Fetch all historical versions for a given content item."""
+        c_stmt = select(GeneratedContent).where(
+            GeneratedContent.id == content_id,
+            GeneratedContent.organization_id == org_id
+        )
+        c_res = await db.execute(c_stmt)
+        content_obj = c_res.scalar_one_or_none()
+        if not content_obj:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Content not found")
+
+        stmt = select(ContentVersion).where(
+            ContentVersion.content_id == content_id
+        ).order_by(ContentVersion.version_number.asc())
+        res = await db.execute(stmt)
+        return list(res.scalars().all())
 
 
