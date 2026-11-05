@@ -131,9 +131,9 @@ class QualityService:
         improved_body = await ai_provider.generate_text(prompt, temperature=0.5, max_tokens=4096)
         
         # Save new version
-        v_stmt = select(ContentVersion).where(ContentVersion.content_id == content.id).order_by(ContentVersion.version_number.desc())
+        v_stmt = select(ContentVersion).where(ContentVersion.content_id == content.id).order_by(ContentVersion.version_number.desc()).limit(1)
         v_res = await db.execute(v_stmt)
-        latest_v = v_res.scalar_one_or_none()
+        latest_v = v_res.scalars().first()
         next_num = (latest_v.version_number + 1) if latest_v else 2
 
         new_version = ContentVersion(

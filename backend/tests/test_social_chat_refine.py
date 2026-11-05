@@ -41,6 +41,61 @@ async def test_social_chat_refine_logic():
         assert result["change_summary"] == "Make it punchier with 3 bullet points."
 
 @pytest.mark.asyncio
+async def test_social_chat_refine_multiple_existing_versions():
+    """
+    Ensure that when multiple historical versions exist in the database,
+    it does NOT throw MultipleResultsFound (the bug where scalar_one_or_none was used on ordered list).
+    """
+    req = SocialChatRefineRequest(
+        content_id="content-multi",
+        platform="twitter",
+        current_content="Active Twitter thread",
+        instruction="Add hashtags",
+    )
+
+    mock_content = GeneratedContent(
+        id="content-multi",
+        organization_id="org-123",
+        title="Twitter Thread",
+        platform="Twitter",
+        content_type="social_twitter",
+        body="Active Twitter thread",
+        word_count=3,
+        character_count=21
+    )
+
+    # Mock execute for content lookup
+    mock_content_res = MagicMock()
+    mock_content_res.scalar_one_or_none.return_value = mock_content
+
+    # Mock execute for version lookup returning multiple versions (e.g. v2 and v1)
+    mock_v_res = MagicMock()
+    v2 = ContentVersion(id="v2", content_id="content-multi", version_number=2, title="T", body="B2")
+    # scalars().first() should return v2
+    mock_v_res.scalars.return_value.first.return_value = v2
+
+    mock_db = MagicMock()
+    mock_db.execute = AsyncMock(side_effect=[mock_content_res, mock_v_res])
+    mock_db.commit = AsyncMock()
+    mock_db.refresh = AsyncMock()
+    mock_db.add = MagicMock()
+
+    mock_provider = MagicMock()
+    mock_provider.generate_text = AsyncMock(return_value="Active Twitter thread #AI #Tech")
+
+    with patch("app.services.content_service.get_ai_provider", return_value=mock_provider):
+        result = await ContentService.social_chat_refine(
+            data=req,
+            org_id="org-123",
+            user_id="user-123",
+            db=mock_db
+        )
+
+        assert result["success"] is True
+        assert result["version_number"] == 3
+        assert result["refined_content"] == "Active Twitter thread #AI #Tech"
+
+@pytest.mark.asyncio
 async def test_restore_version_schema_and_call():
     mock_content = GeneratedContent(
         id="content-abc",
@@ -69,9 +124,8 @@ async def test_restore_version_schema_and_call():
     mock_res_version.scalar_one_or_none.return_value = mock_version
 
     mock_res_latest = MagicMock()
-    mock_res_latest.scalar_one_or_none.return_value = ContentVersion(
-        id="v-3", content_id="content-abc", version_number=3, title="LinkedIn", body="v3"
-    )
+    v3 = ContentVersion(id="v-3", content_id="content-abc", version_number=3, title="LinkedIn", body="v3")
+    mock_res_latest.scalars.return_value.first.return_value = v3
 
     mock_db = MagicMock()
     mock_db.execute = AsyncMock(side_effect=[mock_res_content, mock_res_version, mock_res_latest])

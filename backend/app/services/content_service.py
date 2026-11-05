@@ -365,9 +365,9 @@ class ContentService:
         # If body was edited, increment version history
         if body_changed:
             # Get latest version number
-            v_stmt = select(ContentVersion).where(ContentVersion.content_id == content.id).order_by(ContentVersion.version_number.desc())
+            v_stmt = select(ContentVersion).where(ContentVersion.content_id == content.id).order_by(ContentVersion.version_number.desc()).limit(1)
             v_res = await db.execute(v_stmt)
-            latest_v = v_res.scalar_one_or_none()
+            latest_v = v_res.scalars().first()
             next_num = (latest_v.version_number + 1) if latest_v else 1
 
             new_v = ContentVersion(
@@ -580,9 +580,9 @@ class ContentService:
                 # Find current highest version number
                 v_stmt = select(ContentVersion).where(
                     ContentVersion.content_id == content_obj.id
-                ).order_by(ContentVersion.version_number.desc())
+                ).order_by(ContentVersion.version_number.desc()).limit(1)
                 v_res = await db.execute(v_stmt)
-                latest_v = v_res.scalar_one_or_none()
+                latest_v = v_res.scalars().first()
                 version_num = (latest_v.version_number + 1) if latest_v else 2
 
                 # Update active content body
@@ -648,9 +648,9 @@ class ContentService:
         # Find latest version number to create a new restored version entry
         lv_stmt = select(ContentVersion).where(
             ContentVersion.content_id == content_id
-        ).order_by(ContentVersion.version_number.desc())
+        ).order_by(ContentVersion.version_number.desc()).limit(1)
         lv_res = await db.execute(lv_stmt)
-        latest_v = lv_res.scalar_one_or_none()
+        latest_v = lv_res.scalars().first()
         next_v_num = (latest_v.version_number + 1) if latest_v else (version_number + 1)
 
         # Update active content
