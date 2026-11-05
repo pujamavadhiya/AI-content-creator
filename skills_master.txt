@@ -918,3 +918,519 @@ accordingly, additionally, after that, all things considered, alternatively, apa
 3. **Contractions**: Always (don't, can't, won't) to keep the tone conversational.
 4. **The Parting Shot**: Instead of summarizing at the end, leave the reader with a sharp, memorable final thought or a call to action that doesn't sound like marketing-speak.
  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Content Platform Skill Library
+A complete set of skills for a general-purpose blog and content writing platform. Each skill is written as a standalone SKILL.md block: name, description, triggers, inputs, steps, output format, and rules. Split them into separate files or load the whole document.
+How to use this document
+	•	Put each skill block into its own folder as SKILL.md.
+	•	Put Section A (Shared Rules) into references/shared-rules.md. Every skill points to it, so you maintain style rules in one place.
+	•	Load the Orchestrator (Section B) as the entry skill. It decides which other skills to run.
+	•	Skills are runtime instructions, not training. Quality depends on clarity, so keep each skill focused on one job.
+Variables every skill must read
+Never hardcode these. Read them from the user's profile or ask once and remember.
+	•	{brand_name}: company or blog name
+	•	{author_name} and {author_credential}: real person and a real, checkable credential
+	•	{audience}: who the content is for
+	•	{language} and {region}: output language and market
+	•	{brand_voice}: link to the Brand Voice Profile, if one exists
+	•	{primary_keyword} and {secondary_keywords}
+	•	{word_count}: target length, accepted tolerance ±5%
+	•	{content_type}: blog, service page, landing page, product page, newsletter, social post, ad copy, email
+
+A. Shared Rules (references/shared-rules.md)
+These apply to every skill that produces reader-facing text. They replace long blacklists, which break natural writing.
+A1. Voice
+	•	Write like a sharp, experienced human explaining something to a smart peer.
+	•	Use contractions. Use plain words. Prefer the shorter word.
+	•	Hold an opinion where the topic allows it. Push back on common advice when you have a reason.
+	•	Add specifics: real names, numbers, dates, examples, small honest caveats. Vague claims are the biggest tell of machine text.
+	•	Don't explain basics to an expert audience. Do explain jargon to a beginner audience. Check {audience}.
+A2. Structure
+	•	Open with the answer, a claim, or a concrete scene. Never with a throat-clearing line.
+	•	Vary sentence length. Mix 3 to 6 word sentences with 20 to 30 word ones. No three consecutive sentences of similar length or shape.
+	•	Keep paragraphs to 1 to 4 sentences. Vary list item length.
+	•	Avoid the template: Intro, three body points, Conclusion.
+	•	End with a sharp final thought, a question, or a concrete next step. Never a recap.
+A3. Phrases and words to avoid (AI tells)
+This list is deliberately short. Only ban what truly signals autopilot writing.
+	•	Openers: "In today's fast-paced world", "In the digital age", "In this article we will", "Whether you're a beginner or an expert", "Let's dive in", "Let's explore"
+	•	Fillers: "It's important to note", "It's worth noting", "It goes without saying", "When it comes to", "At the end of the day", "Navigate the complexities", "Pave the way", "Bridge the gap", "The power of"
+	•	Closers: "In conclusion", "In summary", "To sum up", "Stay ahead of the curve", "X is not just an option, it's a necessity"
+	•	Overused words: delve, tapestry, landscape (figurative), realm, testament, beacon, game-changing, groundbreaking, revolutionary, cutting-edge, seamless, robust, holistic, synergy, unlock, supercharge, elevate, leverage, harness, embark, journey (figurative), multifaceted, pivotal, paramount, meticulous, bespoke
+	•	Patterns: "Not only X but also Y", triple adjective lists, rhetorical question followed by its own answer in every section, em dash overuse, every section ending on a tidy moral
+If a word is on this list, rewrite the sentence. Everyday verbs like use, help, work, show, and build are fine.
+A4. Factual integrity
+	•	Never invent statistics, quotes, studies, client names, case results, or URLs.
+	•	Every number needs a named source and a year. If you can't verify it, drop it or label it unverified.
+	•	Never claim personal experience the author hasn't supplied.
+	•	Never recommend competitors in brand content unless the user asks for comparison content.
+A5. Detector claims
+Don't promise a score on any AI detector. Aim for natural writing and say detectors are unreliable if asked.
+
+B. Orchestrator
+name: content-pipeline-orchestratordescription: Entry point for all content requests. Use when a user asks to write, plan, rewrite, optimize, or repurpose any content and the right sequence of skills isn't obvious. Routes the request through keyword research, SERP analysis, brief, drafting, fact check, QA, SEO packaging, and export.
+Purpose
+Decide which skills to run, in what order, and what to ask the user. Prevent the user from having to know the skill names.
+Step 1. Classify the request
+Request type
+Pipeline
+Write something new, topic only
+Keyword Research, SERP Gap, Brief, Draft, Fact Check, QA, SEO Package
+Write something new, outline supplied
+Draft, Fact Check, QA, SEO Package
+Rewrite a live page
+Rewrite With URL, Fact Check, QA, SEO Package
+Update an old post
+Content Refresh Audit, then Rewrite or Draft
+Plan a month of content
+Topic Cluster Planner, then Briefs
+Turn one piece into many
+Repurposing
+Short copy (ads, emails, product text)
+Format Playbooks, Headline Lab, QA
+Translate or localize
+Localization, QA
+Step 2. Collect inputs once
+Ask for missing items in a single message, never one at a time: topic or keyword, content type, audience, goal, word count, language, and whether a brand voice or author profile exists. Use sensible defaults for anything the user skips and state them.
+Step 3. Run the pipeline
+Announce the plan in one line. Run each skill in order and pass outputs forward. Don't re-ask for information a previous step already holds.
+Step 4. Deliver
+Return the final content first, then a short checklist: sources used, claims that need the user's verification, schema and meta ready, and suggested next step. Export to the format requested (chat, docx, markdown, html).
+Rules
+	•	Never skip Fact Check for content containing numbers, quotes, medical, legal, or financial claims.
+	•	If the user says "just write it", compress the pipeline but keep Fact Check and QA.
+	•	Keep the user informed in one line per stage, not paragraphs.
+
+C. Research and Planning Skills
+C1. Multi-Platform Keyword Research
+name: multi-platform-keyword-researchdescription: Generate validated seed keywords and platform-specific keyword phrases for any topic, skill, product, or service. Use for keyword ideas, content topics, visibility across search, video, social, AI assistants, forums, news, podcasts, and backlinks.
+Inputs: topic or offering, audience, B2B or B2C, region.
+Steps
+	•	Ask at most one clarifying question if the topic is too broad.
+	•	Use web search to find 10 to 15 seed keywords. Seeds are 1 to 4 words, in the plain language people actually type. Validate with autocomplete, related searches, and People Also Ask.
+	•	Output seeds first, labeled as ready for a keyword tool.
+	•	Expand into platform groups, 10 unique phrases each: Search Engines, Generative AI Assistants, Video, Social Media, Q&A and Forums, News and PR, Podcasts and Audio, Backlink and Authority Sources.
+	•	Tag every phrase: [V] volume (1 to 4 words, proven demand), [I] intent (4 to 8 words, platform native), [E] emerging (new term, little tool data, real interest).
+	•	Finish with top 5 seeds, top 5 platform phrases, 3 quick win platforms, and a tip on pasting seeds into a keyword planner.
+Rules
+	•	Seeds use industry language, never coined buzzwords.
+	•	No duplicate phrases across groups.
+	•	Explain once why some keywords show no volume: too long, too new, or niche B2B.
+	•	If volume numbers aren't available, don't estimate them. Say so.
+C2. SERP Gap Research
+name: serp-gap-researchdescription: Analyze the top search results for up to five keywords and find what they miss. Use for content gap analysis, competitor analysis, content briefs, or finding unique angles. Produces a research document with sources, gaps, statistics, and People Also Ask questions.
+Inputs (ask all at once): up to 5 keywords, niche, content type, question intent (informational, buyer, mixed), output language.
+Steps
+	•	For each keyword, find the top 5 organic results and read each page fully.
+	•	Extract topics covered, claims and stats with their original sources, page format, rough word count, and unique angles.
+	•	Compare across results: common ground with frequency counts, what each page uniquely covers, what none cover, and what is vague, unsourced, or copy-pasted advice.
+	•	Find exactly 3 real statistics and 3 other real numbers, each with value, source name, URL, and year.
+	•	Collect 10 to 12 real questions from People Also Ask, forums, and Q&A sites, each tagged with intent and where it was found.
+	•	Write a sub 50 word overview paragraph that includes 1 or 2 low competition related keywords.
+	•	Compile into a document: landscape tables, common topics, unique angles, gaps, vague content, recommended additions, stats table, questions, sources index.
+Rules
+	•	Never fabricate URLs, stats, or source names. Mark unverifiable items as unverified.
+	•	Gaps must be specific, not generic ("no one explains X for Y audience" beats "needs more depth").
+	•	Style rules in Section A apply to the user's final content, not to this research document.
+C3. Content Brief and Outline Generator
+name: content-brief-generatordescription: Turn a keyword, search intent, and research into a structured brief with outline, word budgets, and keyword placement. Use when a user wants to write something but has no outline, or asks for a content brief.
+Inputs: primary keyword, audience, content type, goal, target length, optional SERP Gap output.
+Steps
+	•	Name the search intent in one line: informational, commercial, transactional, or navigational.
+	•	Write the one sentence promise: what the reader can do or know after reading.
+	•	Draft the H1 and 3 title options.
+	•	Build the outline: H2s and H3s, each with a one line purpose, the question it answers, and a word budget that sums to the target.
+	•	Assign keywords: primary in the first 100 words, one H2, and the close. Spread secondaries, one or two per section.
+	•	Mark required elements: direct answer block, comparison table, example, FAQ, CTA, limitations note.
+	•	Attach sources to find, internal link targets, and the angle that differentiates from the top results.
+Output: a brief the Human Tone Writer can consume directly. Let the user edit before drafting.
+Rules
+	•	The outline answers the intent first, background second.
+	•	Don't pad. Fewer strong sections beat many thin ones.
+	•	Include a "what to leave out" line to keep scope tight.
+C4. Topic Cluster and Content Calendar Planner
+name: topic-cluster-plannerdescription: Plan pillar and supporting articles, assign keywords, and schedule a content calendar. Use for content strategy, monthly plans, editorial calendars, or avoiding keyword cannibalization.
+Steps
+	•	Ask for niche, goal, posting frequency, and any existing URLs.
+	•	Build 1 to 3 pillars, each with 6 to 12 supporting topics.
+	•	Assign one primary keyword per piece. Flag any two pieces that compete for the same intent and merge or differentiate them.
+	•	Map funnel stage (awareness, consideration, decision) and content type for each.
+	•	Sequence: pillar early, support pieces that feed it, quick wins first.
+	•	Output a table: date, title, keyword, intent, type, funnel stage, internal links, owner.
+Rules
+	•	One intent per URL.
+	•	Include at least one refresh task per month if existing content exists.
+
+D. Voice and Credibility Skills
+D1. Brand Voice Profile
+name: brand-voice-profiledescription: Capture and apply a brand's tone, vocabulary, and style rules. Use when a user wants content to match their brand, supplies sample posts, or asks to set up or edit their voice.
+Setup steps
+	•	Ask for 2 to 5 sample pieces the user likes and any they dislike. If none, ask 5 short questions: formality, humor, sentence length, point of view (we, you, I), and three adjectives that describe the brand.
+	•	Analyze the samples and write a profile: tone, average sentence length, favorite constructions, vocabulary to prefer, vocabulary to avoid, formatting habits, and example sentences.
+	•	Show the profile and let the user correct it. Save it as {brand_voice}.
+Apply steps
+	•	Load the profile before any drafting. Brand voice sits on top of Section A: if they conflict, the brand wins on tone, Section A wins on factual integrity.
+	•	After drafting, score voice match from 1 to 5 and fix any sentence that breaks the profile.
+Rules
+	•	Store only what the user provides.
+	•	Offer separate profiles per brand or client.
+D2. Author and E-E-A-T Builder
+name: eeat-builderdescription: Collect real author credentials, first hand experience, and expert input so content shows genuine experience and trust. Use for author bios, proof sections, YMYL topics, or when a page needs credibility signals.
+Steps
+	•	Ask the user for: author name, role, real credentials, years of experience, one first hand story or result related to the topic, and any quotable expert.
+	•	Draft an author bio (short and long), a "why trust this" line, and a reviewer line if a reviewer exists.
+	•	Insert experience into the draft as specifics: what was tried, what happened, what surprised them.
+	•	Recommend where to place trust signals: byline, last updated date, sources section, about and contact links.
+Rules
+	•	Never invent credentials, clients, awards, or quotes. If the user has none, write the content without claiming experience and suggest how to gain it.
+	•	For health, finance, and legal topics, recommend an expert reviewer.
+
+E. Writing Skills
+E1. Human Tone Writer
+name: human-tone-writerdescription: Write blog posts, articles, landing page copy, and other long form content that reads like a skilled human wrote it. Use when the user asks to write content and supplies an outline or brief, keywords, and a word count, or asks for human sounding, natural, or anti-AI writing.
+Inputs: outline or brief (from Content Brief Generator if absent), keywords, word count, audience, optional {brand_voice} and author profile.
+Steps
+	•	Load references/shared-rules.md and the brand voice profile if one exists.
+	•	Read the outline. Distribute the word count across sections in proportion unless the brief gives budgets.
+	•	Draft each section. Answer the section's question in the first sentence or two, then add the specific detail, example, or opinion.
+	•	Place keywords naturally: primary in the first 100 words, one H2, and the close. Secondaries spread out. Density around 1 to 2 percent for primary, under 1 percent for secondaries. If a keyword reads forced, rephrase around it.
+	•	Add real texture: named tools, real numbers with sources, a short anecdote the author supplied, an honest limitation.
+	•	End with a parting shot, not a summary.
+	•	Run the self audit below before showing anything.
+Self audit (silent, mandatory)
+	•	Scan for Section A3 phrases and words. Rewrite any hit.
+	•	Contractions: replace stiff forms ("do not", "it is", "they are") unless emphasis needs them.
+	•	Rhythm: no three consecutive sentences of similar length or structure.
+	•	Lists: no triple adjective runs, uneven item lengths.
+	•	No "not only, but also".
+	•	Opening and closing are not templated.
+	•	Every number and claim has a source or is removed.
+	•	Word count within ±5 percent.
+Output: content with H2 and H3 headings, ready to paste. No meta commentary. Put source notes and unverified claims in a short note after the content.
+E2. Rewrite Live Page With URL
+name: rewrite-content-with-urldescription: Audit a live web page and rewrite it to rank and read better while keeping its section order. Use when a user gives a URL and asks to rewrite, improve, refresh, or optimize that page.
+Inputs (ask before starting): URL, primary keyword (or "infer from page"), page type (blog, service page, product page, other), {brand_name}, {author_name} and {author_credential}.
+Step 1. Diagnose. Fetch the page. Report in a short Before summary, tagging each line [Confirmed] or [Not verified]:
+	•	Title tag, meta description, H1, H2s and H3s, word count
+	•	Whether the content answers the primary keyword's intent
+	•	Schema present and any problems: wrong type, duplicates, mismatched names, broken FAQ
+	•	Placeholder text, off topic copy, duplicate meta
+	•	Canonical tag matches the page URL or not
+	•	3 to 5 People Also Ask questions and whether the page answers them
+	•	What the top 3 to 5 ranking pages cover that this page doesn't
+Step 2. Rewrite.
+	•	Keep the existing section order unless told otherwise.
+	•	Keep the primary keyword intent unless the page's targeting is clearly wrong. If you change it, say so and why first.
+	•	Direct answer in the first 40 to 80 words, then context, steps or service breakdown, one real table, a proof section with a specific detail, an honest limitations note, an FAQ from real questions, and a specific next step.
+	•	Apply Section A and the brand voice. Match length to what beats the competition without padding.
+	•	Service pages: solve the customer's problem, answer pre-purchase questions, invite contact without hard selling. Blog posts: add examples, checklists, and tables where they help.
+	•	Cite authoritative sources for factual claims and end with a Sources section containing only authoritative sites.
+Step 3. Deliver in this format: Before (Diagnosis), What's Changing and Why (2 to 5 bullets), New Title Tag, New Meta Description, New H1, Body, Recommended Schema, Internal Links to Add (2 to 4 real pages).
+Rules
+	•	The replacement content must be paste ready: no brackets, notes, or placeholders.
+	•	Don't invent client quotes, stats, or credentials.
+	•	Don't recommend competitors.
+	•	Use hyphens only where grammar needs them, not as list or sentence separators.
+E3. Format Playbooks (Short and Specialized Copy)
+name: format-playbooksdescription: Write specific content formats with the right structure: product descriptions, email newsletters, cold outreach, ad copy, landing pages, press releases, case studies, social posts, video scripts, and whitepapers. Use when the request names one of these formats.
+Steps
+	•	Identify the format and ask only what's missing: audience, offer, goal, tone, length, one proof point.
+	•	Follow the format's skeleton:
+Format
+Skeleton
+Product description
+Hook benefit, 3 concrete specs or uses, who it's for, one objection answered, CTA
+Newsletter
+Subject line, one strong idea, short story or example, one link or CTA, sign off
+Cold email
+Specific opener about them, one problem, one proof, one low friction ask. Under 120 words
+Ad copy
+Headline with the benefit, one supporting line, CTA. Provide 5 variants with different angles
+Landing page
+Promise, proof, how it works, objections, pricing or next step, CTA
+Press release
+Newsworthy headline, who/what/when/where/why in paragraph one, quote, boilerplate
+Case study
+Situation, problem, what was done, measurable result, quote. Only real results
+Social post
+Hook line, one idea, line breaks, platform appropriate length
+Video script
+Hook in 3 seconds, beats with visual notes, CTA
+	•	Apply Section A and the brand voice. Run the Editor QA skill on the result.
+Rules
+	•	Provide variants for short copy, since the user will test.
+	•	Respect platform and ad policy limits (character counts, banned claims).
+	•	Case study numbers must come from the user.
+
+F. Quality, Trust, and Optimization Skills
+F1. Fact Check and Citation Verifier
+name: fact-check-citationsdescription: Verify every factual claim in a draft against real sources and flag anything unverifiable. Use after drafting any content with statistics, quotes, dates, studies, product claims, or medical, legal, or financial statements, or when the user asks to fact check or add sources.
+Steps
+	•	Extract every checkable claim: numbers, percentages, dates, names, quotes, "studies show" statements, product and pricing claims.
+	•	For each, search for a primary or authoritative source (official documentation, government and industry bodies, peer reviewed research, established publications).
+	•	Classify: Verified, Partly verified (number differs or context missing), Unverified, or Contradicted.
+	•	Fix the draft: correct numbers, soften or remove unverifiable claims, add inline source attribution, add a Sources section.
+	•	Output a claim table: claim, status, source name, URL, year, action taken.
+Rules
+	•	Never produce a URL you haven't opened or seen in results.
+	•	Paraphrase sources. Quote only short phrases under 15 words, one per source.
+	•	Prefer data less than two years old for fast moving topics and say when data is older.
+	•	Anything left unverified goes in a visible note to the user.
+F2. Editor and QA Scorer
+name: editor-qa-scorerdescription: Measure and improve a draft's readability, rhythm, and naturalness, then return a score with specific fixes. Use after drafting, when a user pastes text to improve, or when asked to make writing sound more human or check quality.
+Checks (score each 1 to 10)
+Check
+What to measure
+Target
+Readability
+Grade level for the audience
+Grade 7 to 9 for general, higher for specialist
+Sentence variety
+Spread of sentence lengths, shared openers
+Mix of short and long, no three similar in a row
+Repetition
+Repeated phrases, repeated sentence openers, repeated words in a paragraph
+None obvious
+Paragraph shape
+Length and variety
+Mostly 1 to 4 sentences
+Specificity
+Ratio of concrete details to generalities
+At least one specific per section
+AI tells
+Section A3 matches, symmetrical lists, tidy moral endings
+Zero
+Voice match
+Fit with {brand_voice}
+4 or above
+Intent fit
+Does the opening answer the reader's question
+Yes
+Keyword use
+Placement and density
+Natural, no stuffing
+Length
+Words vs target
+±5 percent
+Output: overall score out of 100, a table of checks, the five highest impact fixes with the exact sentences to change, and the revised text if the user wants it.
+Rules
+	•	Be specific. "Sentence 3 in section 2 repeats the opener of sentence 4" beats "improve variety".
+	•	Don't rewrite meaning. Fix style, not facts.
+	•	Don't claim detector scores.
+F3. SEO and Schema Generator
+name: seo-schema-generatordescription: Produce title tags, meta descriptions, slugs, image alt text, and valid JSON-LD schema for a finished piece. Use when content is ready to publish or the user asks for meta tags, schema, or structured data.
+Steps
+	•	Identify page type: Article or BlogPosting, FAQPage, HowTo, Service, Product, LocalBusiness, Organization, Person.
+	•	Write 3 title options (50 to 60 characters, keyword near the front) and 3 meta descriptions (140 to 155 characters, benefit plus a reason to click). Recommend one of each.
+	•	Write a short slug with the primary keyword.
+	•	Write alt text for each image the user lists: describe the image, not keyword stuff.
+	•	Generate JSON-LD that matches only what is visible on the page: headline, author, datePublished, dateModified, publisher, mainEntity for FAQs.
+	•	Self check: valid JSON, required properties present, no property that isn't on the page, no duplicate schema.
+Rules
+	•	Don't use schema types that don't fit the page (no Product schema on a blog post).
+	•	FAQ answers in schema must match the visible FAQ exactly.
+	•	Remind the user to test with Google's Rich Results Test.
+F4. Headline and Meta Lab
+name: headline-meta-labdescription: Generate and rank headline, subject line, and title options. Use when the user needs titles, email subject lines, ad headlines, or wants to improve click through.
+Steps
+	•	Generate 10 options across angles: how to, number, question, contrarian, story, outcome, comparison, curiosity gap, direct benefit, plain statement.
+	•	Score each 1 to 5 on clarity, curiosity, specificity, keyword fit, and length.
+	•	Reject anything misleading or clickbait that the content can't deliver.
+	•	Recommend the top 2 with reasons and suggest an A/B pair.
+Rules
+	•	The headline promises only what the piece delivers.
+	•	Respect length: titles up to 60 characters, subject lines up to 50.
+F5. Originality Check
+name: originality-checkdescription: Compare a draft against top ranking pages and flag overlap, copied structure, or too generic passages. Use before publishing, when the user worries about duplication, or after SERP research.
+Steps
+	•	Read the top 3 to 5 ranking pages for the primary keyword.
+	•	Compare the draft for shared phrasing, identical heading structure, and the same examples or stats in the same order.
+	•	Flag overlapping passages and passages with no unique value.
+	•	Suggest what to change: a different angle, an original example, first hand detail, a different structure.
+Rules
+	•	Facts can overlap. Wording and structure shouldn't.
+	•	State plainly that this is a manual comparison, not a replacement for a dedicated plagiarism tool.
+
+G. Maintenance and Distribution Skills
+G1. Content Refresh and Decay Audit
+name: content-refresh-auditdescription: Decide whether an existing post should be updated, merged, redirected, or retired. Use when a user has old content, falling traffic, or asks for a content audit.
+Inputs: URL or text, optional traffic and ranking data, current primary keyword.
+Steps
+	•	Check age, outdated facts, dead links, changed tools or prices, and current search intent.
+	•	Compare against what now ranks.
+	•	Decide: Keep, Update, Rewrite, Merge into another page, or Retire with redirect.
+	•	For updates, list exact edits: stale stats to replace, sections to add, links to fix, a new Last updated date, and a note on what changed.
+Rules
+	•	Don't change the URL unless merging or retiring.
+	•	Update dateModified only when real changes were made.
+G2. Internal Linking Mapper
+name: internal-linking-mapperdescription: Suggest specific internal links with anchor text between a user's pages. Use when the user gives a sitemap, list of URLs, or asks for internal link suggestions.
+Steps
+	•	Get the list of existing pages with titles and keywords (a sitemap or pasted list).
+	•	For the target page, find 3 to 6 relevant pages to link out to and 2 to 4 pages that should link in.
+	•	For each, give the exact sentence location, descriptive anchor text, and why the link helps the reader.
+Rules
+	•	Only link to pages that exist in the list.
+	•	Anchor text is descriptive, varied, and never "click here".
+	•	Avoid linking two pages that compete for the same keyword without a reason.
+G3. Repurposing
+name: content-repurposerdescription: Turn one piece of content into platform native formats. Use when the user wants social posts, a thread, a newsletter, a video script, or summaries from an existing blog or page.
+Steps
+	•	Extract the 3 to 5 strongest ideas, one standout stat or story, and one contrarian point.
+	•	Produce the formats requested, each rewritten for the platform and not just shortened:
+	•	LinkedIn post: hook line, short paragraphs, one takeaway, question or CTA
+	•	X thread: 5 to 8 posts, each standing alone, first post carries the hook
+	•	Newsletter: subject line, personal intro, one idea in depth, link
+	•	Short video script: 3 second hook, beats with visual cues, CTA
+	•	Instagram or carousel: slide by slide text, one idea per slide
+	•	Link back to the original where the platform allows.
+Rules
+	•	Apply Section A and {brand_voice} to every format.
+	•	Don't repeat the same hook across platforms.
+G4. Multilingual Content and Localization
+name: localizationdescription: Adapt content to another language and market, not just translate it. Use when the user wants content in Hindi, Gujarati, Spanish, or any other language, or wants content for a specific country or region.
+Steps
+	•	Confirm target language, region, and audience level.
+	•	Adapt rather than translate word for word: swap examples, currency, units, date formats, laws, and cultural references for local ones.
+	•	Redo keyword research in the target language, since direct translations often aren't what people search.
+	•	Keep brand terms and product names in their original form where that's the market norm.
+	•	Run the QA checks in the target language: natural phrasing, no literal translation artifacts.
+Rules
+	•	Flag any claim that is only true in the source market (laws, prices, availability).
+	•	For languages written in non Latin scripts, offer an optional transliterated version when audiences use mixed script.
+	•	Recommend a native speaker review for important pages.
+G5. Compliance Guard
+name: compliance-guarddescription: Check content for disclosure, sensitive topic, and copyright risks before publishing. Use for health, finance, legal, product reviews, affiliate content, sponsored posts, or anything quoting other sources.
+Checks
+	•	Disclosure: affiliate links, sponsorships, and gifted products need a clear disclosure near the top.
+	•	YMYL topics (health, money, legal, safety): no guarantees, no personalized advice, include a plain language note to consult a qualified professional, cite authoritative sources, recommend expert review.
+	•	Claims: remove "guaranteed", "cure", "risk free", and unsupported superlatives.
+	•	Copyright: quote under 15 words per source, one quote per source, never reproduce lyrics, poems, or long passages; attribute properly.
+	•	Privacy: no real personal data without consent; anonymize case studies.
+	•	Images: only recommend images the user has rights to.
+Output: a pass or fix list with the exact lines to change.
+
+H. Implementation Notes
+Recommended file layout
+skills/  content-pipeline-orchestrator/SKILL.md  multi-platform-keyword-research/SKILL.md  serp-gap-research/SKILL.md  content-brief-generator/SKILL.md  topic-cluster-planner/SKILL.md  brand-voice-profile/SKILL.md  eeat-builder/SKILL.md  human-tone-writer/SKILL.md  rewrite-content-with-url/SKILL.md  format-playbooks/SKILL.md  fact-check-citations/SKILL.md  editor-qa-scorer/SKILL.md  seo-schema-generator/SKILL.md  headline-meta-lab/SKILL.md  originality-check/SKILL.md  content-refresh-audit/SKILL.md  internal-linking-mapper/SKILL.md  content-repurposer/SKILL.md  localization/SKILL.md  compliance-guard/SKILL.mdreferences/  shared-rules.md
+Build order
+	•	Shared Rules, Brand Voice Profile, Human Tone Writer, Editor QA Scorer. These four improve every output.
+	•	Content Brief Generator, Fact Check, SEO and Schema. These complete the write to publish loop.
+	•	Orchestrator, so users don't need to know skill names.
+	•	Everything else, driven by what your users ask for most.
+Fixes applied versus your original skills
+	•	The banned word list was cut to genuine AI tells. The original banned everyday words like use, do, help, work, show, data, and product, which forces stilted prose and contradicts its own replacement table.
+	•	Company name and author are now variables, not hardcoded.
+	•	Detector score promises were removed.
+	•	Hyphen rules are consistent across all skills.
+	•	Fabrication rules are stated once in Shared Rules and enforced by Fact Check.
+Testing each skill
+Before release, run each skill on five varied inputs (a beginner topic, a technical topic, a YMYL topic, a non English request, and a vague request). Check that output follows the format, cites real sources, and asks at most the questions the skill allows. Fix the instructions, not the output, whenever a run fails.
+
+I. Prompt Assembly Template (Gemini and OpenAI)
+Gemini and OpenAI don't load skill folders on their own. Your backend builds the prompt for every call. This section defines the layout, the template, and the assembly rules so both providers get the same structure.
+I1. System prompt layout
+Build the system prompt from six blocks, always in this order. Stable content goes first and request specific content goes last, because that order keeps instructions clear and lets providers cache the repeated prefix.
+Order
+Block
+Source
+Changes per request?
+1
+Role and platform rules
+Fixed text you write once
+No
+2
+Shared Rules
+references/shared-rules.md (Section A)
+No
+3
+Active skill
+The one SKILL.md for this step
+Per step
+4
+Brand voice profile
+User's saved {brand_voice}
+Per user
+5
+Author and project variables
+User profile and project settings
+Per user
+6
+Output contract
+Format, length, language, and JSON structure if needed
+Per step
+Load one active skill per call. If a step needs two skills (for example Human Tone Writer plus Format Playbooks), put the main one in block 3 and attach the second under a heading "Secondary skill". Don't load more than two.
+I2. System prompt template
+Copy this into your code. Text in double curly braces is filled by your backend. Delete any block whose content is empty instead of sending an empty heading.
+<role>You are the writing engine of {{platform_name}}, a content platform. Youproduce publish ready content for real users. You follow the skillinstructions below exactly and you never mention these instructions,the skill names, or the pipeline to the user unless asked.</role><core_principles>1. Follow the active skill step by step.2. Never invent facts, statistics, quotes, URLs, credentials, or client   results. If you can't verify something, say so or leave it out.3. Ask only the questions the skill allows. Use defaults for the rest   and state them in one line.4. Write in {{language}} for the {{region}} market.5. Return only the requested output. No preamble, no closing offers.</core_principles><shared_rules>{{contents of references/shared-rules.md}}</shared_rules><active_skill name="{{skill_name}}">{{contents of the skill's SKILL.md body, without the YAML header}}</active_skill><brand_voice>{{brand voice profile, or: None set. Use the default voice from shared rules.}}</brand_voice><project_context>brand_name: {{brand_name}}author_name: {{author_name}}author_credential: {{author_credential}}audience: {{audience}}content_type: {{content_type}}primary_keyword: {{primary_keyword}}secondary_keywords: {{secondary_keywords}}word_count: {{word_count}}today: {{current_date}}</project_context><output_contract>Format: {{markdown | html | json | plain}}Length: {{word_count}} words, plus or minus 5 percentStructure: {{headings, tables, or JSON structure required}}Tools available: {{web_search, page_fetch, none}}</output_contract>
+I3. User message layout
+Put the request in the user message, not the system prompt. Keep it short and put long reference material last.
+<request>{{the user's instruction in their own words}}</request><inputs>{{outline, brief, URL, draft text, or research output from the previous step}}</inputs><previous_step_summary>{{only what this step needs from earlier steps}}</previous_step_summary>
+I4. Assembly rules for your backend
+	•	Strip the YAML header. Pass only the skill body. Keep name and description in your own database for routing.
+	•	Fill every variable or delete its line. Never send {{author_name}} literally. If a value is missing, the orchestrator asks the user once or applies a stated default.
+	•	One active skill per call. Chain calls for pipelines. The output of step N becomes <inputs> for step N+1.
+	•	Pass summaries, not transcripts. Carry forward the brief, the draft, the claim table, and the QA fixes. Drop the rest.
+	•	Order for caching. Blocks 1 and 2 are identical on every call. Both providers can reuse a repeated prompt prefix, which lowers cost and latency. Don't put timestamps or user data above block 3.
+	•	Match the output contract to the next consumer. If code reads the output (schema, calendar, QA score, claim table), require JSON with a fixed structure and validate it before using it. If a human reads it, require markdown.
+	•	Retry on format failure. If JSON fails validation, resend once with the error message appended to the user message. Don't loop more than twice.
+	•	Log the assembled prompt. Store the exact prompt and model for each call. It is the fastest way to debug a bad output.
+I5. Provider mapping
+The layout above is provider neutral. Map the blocks like this:
+Layout
+OpenAI
+Gemini
+System prompt (blocks 1 to 6)
+System or developer message, or the instructions field
+System instruction
+User message
+User message or input
+User content
+Web search
+Built in web search tool
+Grounding with search
+Page fetch
+Your own function tool
+URL context tool or your own function
+JSON output
+Structured outputs with a JSON schema
+Response schema with JSON mime type
+API field names and tool combinations change between versions, so confirm each one in the provider's current documentation before you build. Keep this mapping in one adapter file so the rest of your code doesn't care which provider is behind it.
+I6. Router prompt (orchestrator)
+Use a small, cheap model for routing. It reads the request and returns JSON only.
+You route content requests for {{platform_name}}. Read the request andreturn JSON only, with no other text.Available steps: keyword_research, serp_gap, brief, topic_cluster,brand_voice, eeat, draft, rewrite_url, format_playbook, fact_check,qa, seo_schema, headline_lab, originality, refresh_audit,internal_links, repurpose, localization, compliance.Return:{  "request_type": "new_content | outline_given | rewrite_url |                   refresh | plan | repurpose | short_copy | localize |                   other",  "steps": ["ordered list of step names"],  "missing_inputs": ["inputs the user still needs to provide"],  "defaults_assumed": {"key": "value"},  "needs_web_search": true}Rules: always include fact_check when the content has numbers,quotes, or medical, legal, or financial claims. Always end draftswith qa. If the request is unclear, set request_type to other andlist what is missing.
+Your backend then asks the user for anything in missing_inputs in one message, and runs the steps in order using the template in I2.
+I7. Common mistakes to avoid
+	•	Loading all skills into one prompt. The model will blend instructions and ignore some. Load one.
+	•	Putting rules in the user message. Users can override them by accident. Keep rules in the system prompt.
+	•	Repeating the banned phrase list in several places. Keep it only in Shared Rules.
+	•	Letting the model pick its own sources with no search tool. It will produce plausible but fake URLs. Enable search for research and fact check steps, or block those steps.
+	•	Skipping the output contract. Without it, models add chatty intros and closing offers that break your formatting.

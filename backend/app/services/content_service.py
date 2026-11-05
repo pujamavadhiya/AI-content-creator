@@ -17,7 +17,7 @@ from app.ai.prompts.instagram_generation import get_instagram_prompt
 from app.ai.prompts.facebook_generation import get_facebook_prompt
 from app.ai.prompts.twitter_generation import get_twitter_prompt
 from app.ai.prompts.content_rewrite import get_content_rewrite_prompt
-from app.ai.skills.human_tone import audit_human_tone, get_human_tone_system_rules
+from app.ai.skills.human_tone import audit_human_tone, get_human_tone_system_rules, sanitize_ai_symbols
 from app.ai.skills.url_rewrite import get_url_rewrite_prompt
 from app.services.parser_service import ParserService
 from app.ai.rag.retriever import retrieve_context
@@ -88,6 +88,14 @@ class ContentService:
         )
         ref_context = rag_res["context_text"] if rag_res["has_context"] else None
 
+        # Compulsory keywords parsing
+        compulsory_kw_list = []
+        if getattr(data, "compulsory_keywords", None):
+            import re
+            compulsory_kw_list = [k.strip() for k in re.split(r'[\r\n,;]+', str(data.compulsory_keywords)) if k.strip()]
+        elif getattr(data, "mandatory_keywords", None):
+            compulsory_kw_list = [k.strip() for k in data.mandatory_keywords if k.strip()]
+
         prompt = get_blog_generation_prompt(
             title=topic_title,
             outline_data=outline_dict,
@@ -98,10 +106,13 @@ class ContentService:
             cta_style=cta_style,
             restricted_words=restricted_words,
             preferred_keywords=preferred_keywords,
+            compulsory_keywords=compulsory_kw_list,
             reference_context=ref_context
         )
 
         blog_text = await ai_provider.generate_text(prompt, temperature=0.7, max_tokens=4096)
+        # Strip all raw markdown table pipe grids (|---|) and AI table artifacts
+        blog_text, _ = sanitize_ai_symbols(blog_text)
         words = len(blog_text.split())
 
         content = GeneratedContent(
@@ -319,6 +330,7 @@ class ContentService:
             language=data.language
         )
         revised = await ai_provider.generate_text(prompt, temperature=0.3, max_tokens=2048)
+        revised, _ = sanitize_ai_symbols(revised)
         return {"revised_text": revised.strip()}
 
     @staticmethod
@@ -451,14 +463,14 @@ class ContentService:
                     "word_count": diagnostics.get("word_count"),
                     "identified_gaps": [
                         "Lacks immediate direct answer in first 60 words for AI Overviews",
-                        "Missing interactive comparison data table",
+                        "Missing structured comparative breakdown of approaches",
                         "Contains corporate filler adjectives and robotic transitions"
                     ],
                     "schema_status": "Missing structured FAQ and Article schema"
                 },
                 "whats_changing_and_why": [
                     "Lead with direct 50-word answer to capture featured snippets and Google AI Mode",
-                    "Add structured comparison table contrasting our approach against legacy methods",
+                    "Add structured bulleted trade-offs contrasting our approach against legacy methods (no pipe tables)",
                     "Embed authentic FAQ block addressing commercial buyer objections",
                     "Enforce strict human-tone rules with contractions and zero banned words"
                 ],
@@ -466,8 +478,8 @@ class ContentService:
                     "new_title_tag": f"{primary_kw} Guide: Direct Answers & Practical Playbook",
                     "new_meta_description": f"Cut through generic advice on {primary_kw}. Discover tested solutions, clear comparison metrics, and expert insights.",
                     "new_h1": f"The Real-World Playbook for {primary_kw}",
-                    "body_markdown": f"# The Real-World Playbook for {primary_kw}\\n\\nMost guides overcomplicate {primary_kw}. Here's what actually matters.\\n\\n## What Works\\n\\nWe don't rely on generic advice. We test tools in production.\\n\\n## Comparison Table\\n\\n| Approach | Setup Time | Long-term Maintenance |\\n|---|---|---|\\n| Direct Architecture | 2 hours | Minimal |\\n| Legacy Methods | 3 weeks | High |\\n\\n## Frequently Asked Questions\\n\\n### Why switch now?\\nBecause old systems slow teams down.\\n\\n---\\n*Reviewed by {data.author_name}*",
-                    "comparison_table_markdown": "| Approach | Setup Time | Long-term Maintenance |\\n|---|---|---|\\n| Direct Architecture | 2 hours | Minimal |\\n| Legacy Methods | 3 weeks | High |",
+                    "body_markdown": f"# The Real-World Playbook for {primary_kw}\\n\\nMost guides overcomplicate {primary_kw}. Here's what actually matters.\\n\\n## What Works\\n\\nWe don't rely on generic advice. We test tools in production.\\n\\n## Key Comparative Trade-Offs\\n\\n• **Direct Architecture**: Setup Time: 2 hours — Long-term Maintenance: Minimal\\n• **Legacy Methods**: Setup Time: 3 weeks — Long-term Maintenance: High\\n\\n## Frequently Asked Questions\\n\\n### Why switch now?\\nBecause old systems slow teams down.\\n\\n---\\n*Reviewed by {data.author_name}*",
+                    "comparison_table_markdown": "• **Direct Architecture**: Setup Time: 2 hours — Long-term Maintenance: Minimal\\n• **Legacy Methods**: Setup Time: 3 weeks — Long-term Maintenance: High",
                     "faq_items": [
                         {"question": "How quickly does this yield results?", "answer": "Most teams see measurable improvements within the first sprint."}
                     ],

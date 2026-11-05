@@ -4,7 +4,7 @@ import {
   Topic, TopicCluster, ContentOutline, GeneratedContent,
   ContentEvaluation, CalendarEvent, AnalyticsSummary,
   AIProviderInfo, User, HumanToneAuditResult, MultiPlatformKeywordResult,
-  SerpGapResult, UrlRewriteResult
+  SerpGapResult, UrlRewriteResult, ParaphraseHumanizeResponse
 } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
@@ -191,7 +191,7 @@ export const apiClient = {
   },
 
   // --- Content Generation ---
-  generateBlog: async (payload: { outline_id?: string; topic_title?: string; desired_word_count?: number; writing_tone?: string; brand_id?: string; collection_id?: string }): Promise<GeneratedContent> => {
+  generateBlog: async (payload: { outline_id?: string; topic_title?: string; desired_word_count?: number; writing_tone?: string; brand_id?: string; collection_id?: string; compulsory_keywords?: string }): Promise<GeneratedContent> => {
     const res = await api.post('/api/content/generate-blog', payload);
     return res.data;
   },
@@ -331,6 +331,193 @@ export const apiClient = {
     const res = await api.post('/api/research/serp-gap/export', data, {
       responseType: 'blob'
     });
+    return res.data;
+  },
+
+  // --- Skill Pipeline & Orchestrator ---
+  getSkills: async (): Promise<{ skills: any[]; total: number }> => {
+    const res = await api.get('/api/pipeline/skills');
+    return res.data;
+  },
+
+  routePipeline: async (data: {
+    request: string;
+    project_context?: Record<string, any>;
+    provider?: string;
+  }): Promise<any> => {
+    const res = await api.post('/api/pipeline/route', data);
+    return res.data;
+  },
+
+  executePipeline: async (data: {
+    request: string;
+    steps: string[];
+    project_context?: Record<string, any>;
+    brand_id?: string;
+    provider?: string;
+    compulsory_keywords?: string;
+  }): Promise<any> => {
+    const res = await api.post('/api/pipeline/execute', data);
+    return res.data;
+  },
+
+  executePipelineStep: async (data: {
+    skill: string;
+    request: string;
+    inputs?: string;
+    project_context?: Record<string, any>;
+    provider?: string;
+  }): Promise<any> => {
+    const res = await api.post('/api/pipeline/execute-step', data);
+    return res.data;
+  },
+
+  generatePipelineOutline: async (data: {
+    request: string;
+    project_context?: Record<string, any>;
+    brand_id?: string;
+    provider?: string;
+    compulsory_keywords?: string;
+  }): Promise<{
+    success: boolean;
+    outline: string;
+    primary_keyword?: string;
+    compulsory_keywords_audit?: any;
+    duration_seconds?: number;
+    project_context?: any;
+  }> => {
+    const res = await api.post('/api/pipeline/generate-outline', data);
+    return res.data;
+  },
+
+  generatePipelineDraft: async (data: {
+    request: string;
+    outline: string;
+    project_context?: Record<string, any>;
+    brand_id?: string;
+    provider?: string;
+    compulsory_keywords?: string;
+  }): Promise<{
+    success: boolean;
+    draft: string;
+    word_count: number;
+    compulsory_keywords_audit?: any;
+    symbols_cleaned?: number;
+    duration_seconds?: number;
+    project_context?: any;
+  }> => {
+    const res = await api.post('/api/pipeline/generate-draft', data);
+    return res.data;
+  },
+
+  // --- Full Blog & Optional DALL-E Image Generation ---
+  generateFullBlog: async (data: {
+    request: string;
+    draft?: string;
+    mode?: 'blog' | 'article';
+    project_context?: Record<string, any>;
+    brand_id?: string;
+    provider?: string;
+    compulsory_keywords?: string;
+  }): Promise<any> => {
+    const res = await api.post('/api/pipeline/generate-full-blog', data);
+    return res.data;
+  },
+
+  generateBlogImage: async (data: {
+    blog_title: string;
+    blog_body?: string;
+    custom_prompt?: string;
+    visual_style?: string;
+    openai_api_key?: string;
+  }): Promise<any> => {
+    const res = await api.post('/api/pipeline/generate-image', data);
+    return res.data;
+  },
+
+  attachBlogImage: async (data: {
+    markdown_text: string;
+    image_url: string;
+    alt_text?: string;
+  }): Promise<{ success: boolean; updated_markdown: string }> => {
+    const res = await api.post('/api/pipeline/attach-image', data);
+    return res.data;
+  },
+
+  // --- Anti-Plagiarism Paraphrasing & Symbol Sanitizer ---
+  paraphraseHumanize: async (data: {
+    text: string;
+    mode?: 'anti_plagiarism' | 'humanize_burstiness' | 'deep_rewrite' | 'sanitize_symbols' | 'local_wordnet';
+    target_tone?: string;
+    brand_id?: string;
+    provider?: string;
+    compulsory_keywords?: string;
+  }): Promise<ParaphraseHumanizeResponse> => {
+    const res = await api.post('/api/content/paraphrase-humanize', data);
+    return res.data;
+  },
+
+  sanitizeSymbols: async (text: string): Promise<{ cleaned_text: string; symbols_cleaned: number }> => {
+    const res = await api.post('/api/content/sanitize-symbols', { text });
+    return res.data;
+  },
+
+  replaceBannedWords: async (text: string, compulsory_keywords?: string): Promise<{
+    cleaned_text: string;
+    replaced_words: string[];
+    total_replaced: number;
+    table_symbols_cleaned: number;
+    audit: any;
+    success: boolean;
+  }> => {
+    const res = await api.post('/api/content/replace-banned-words', { text, compulsory_keywords });
+    return res.data;
+  },
+
+  // --- PAWS Paraphrase Training & In-Context Learning ---
+  getPawsDatasetOverview: async (): Promise<any> => {
+    const res = await api.get('/api/training/paws/overview');
+    return res.data;
+  },
+
+  processPawsExemplars: async (): Promise<any> => {
+    const res = await api.post('/api/training/paws/process-exemplars');
+    return res.data;
+  },
+
+  exportPawsFineTune: async (data: { provider?: string; train_limit?: number; val_limit?: number }): Promise<any> => {
+    const res = await api.post('/api/training/paws/export-finetune', data);
+    return res.data;
+  },
+
+  startPawsFineTune: async (data: { model?: string; api_key?: string }): Promise<any> => {
+    const res = await api.post('/api/training/paws/start-finetune', data);
+    return res.data;
+  },
+
+  // --- WordNet Dictionary & Thesaurus Training Endpoints ---
+  getWordNetOverview: async (): Promise<any> => {
+    const res = await api.get('/api/training/wordnet/overview');
+    return res.data;
+  },
+
+  processWordNetLexicon: async (): Promise<any> => {
+    const res = await api.post('/api/training/wordnet/process-lexicon');
+    return res.data;
+  },
+
+  exportWordNetFineTune: async (data: { provider?: string; train_limit?: number; val_limit?: number }): Promise<any> => {
+    const res = await api.post('/api/training/wordnet/export-finetune', data);
+    return res.data;
+  },
+
+  exportCombinedFineTune: async (data: { provider?: string; paws_limit?: number; wordnet_limit?: number }): Promise<any> => {
+    const res = await api.post('/api/training/combined/export-finetune', data);
+    return res.data;
+  },
+
+  getCombinedOverview: async (): Promise<any> => {
+    const res = await api.get('/api/training/combined/overview');
     return res.data;
   },
 };

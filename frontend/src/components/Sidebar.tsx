@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Building2, BookOpen, Sparkles, KeyRound,
   Compass, ListOrdered, PenTool, Share2, Calendar,
-  FolderKanban, Cpu, BarChart3, Settings, LogOut
+  FolderKanban, Cpu, BarChart3, Settings, LogOut, Wand2
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { apiClient } from '@/lib/api';
@@ -37,6 +37,7 @@ export const Sidebar: React.FC = () => {
     {
       title: 'Studio & Publishing',
       items: [
+        { label: 'Autonomous Pipeline', href: '/pipeline', icon: Wand2 },
         { label: 'Blog & Article Writer', href: '/writer', icon: PenTool },
         { label: 'Social Media Studio', href: '/social', icon: Share2 },
         { label: 'Content Calendar', href: '/calendar', icon: Calendar },

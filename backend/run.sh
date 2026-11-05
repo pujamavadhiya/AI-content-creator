@@ -4,7 +4,6 @@
 
 PORT=8000
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BACKEND_DIR="$SCRIPT_DIR/backend"
 
 echo "Checking port $PORT..."
 EXISTING_PID=$(lsof -ti :$PORT)
@@ -17,7 +16,7 @@ else
     echo "Port $PORT is available."
 fi
 
-cd "$BACKEND_DIR"
+cd "$SCRIPT_DIR"
 
 if [ -f "venv/bin/activate" ]; then
     source venv/bin/activate

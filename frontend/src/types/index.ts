@@ -242,9 +242,35 @@ export interface HumanToneAuditResult {
   banned_words_found: string[];
   banned_phrases_found: string[];
   uncontracted_forms_found: string[];
+  table_symbols_detected?: boolean;
+  table_symbols_count?: number;
+  burstiness_score?: number;
+  burstiness_rating?: string;
   cliche_opener_detected: boolean;
   summary_conclusion_detected: boolean;
   suggested_replacements: Record<string, string>;
+}
+
+export interface ParaphraseHumanizeResponse {
+  success: boolean;
+  original_text: string;
+  paraphrased_text: string;
+  human_score: number;
+  human_content_estimate?: number;
+  passes_human_test: boolean;
+  burstiness_score: number;
+  burstiness_rating: string;
+  plagiarism_risk: string;
+  table_symbols_cleaned: number;
+  banned_words_removed: string[];
+  wordnet_matches_count?: number;
+  local_model_matched?: boolean;
+  paws_grounded?: boolean;
+  wordnet_grounded?: boolean;
+  compulsory_keywords_audit?: CompulsoryKeywordsAudit;
+  audit: HumanToneAuditResult;
+  duration_seconds: number;
+  error?: string;
 }
 
 export interface PlatformKeywordItem {
@@ -318,4 +344,108 @@ export interface UrlRewriteResult {
     author_attribution: string;
   };
 }
+
+export interface SkillMetadata {
+  name: string;
+  alias: string;
+  canonical_name: string;
+  label: string;
+  description: string;
+  output_format: 'markdown' | 'json';
+  needs_search: boolean;
+  model_tier: 'fast' | 'strong';
+}
+
+export interface PipelineRouteResponse {
+  request_type: string;
+  steps: string[];
+  missing_inputs: string[];
+  defaults_assumed: Record<string, any>;
+  needs_web_search: boolean;
+  reasoning: string;
+}
+
+export interface WordNetFileStat {
+  filename: string;
+  description: string;
+  category: string;
+  size_mb: number;
+  row_count: number;
+}
+
+export interface WordNetOverviewResponse {
+  total_files: number;
+  total_rows: number;
+  total_size_mb: number;
+  files: WordNetFileStat[];
+  status: string;
+  processed_artifacts: Array<{ filename: string; size_kb: number; modified_time: string }>;
+}
+
+export interface CombinedDatasetOverviewResponse {
+  total_combined_rows: number;
+  total_combined_files: number;
+  paws: any;
+  wordnet: WordNetOverviewResponse;
+  all_processed_artifacts: Array<{ filename: string; size_kb: number; modified_time: string }>;
+}
+
+export interface PipelineExecutionLog {
+  step_index: number;
+  step_name: string;
+  step_key: string;
+  label: string;
+  duration_seconds: number;
+  format: string;
+  error?: string | null;
+}
+
+export interface CompulsoryKeywordsAudit {
+  total: number;
+  found_count: number;
+  missing_count: number;
+  compliance_rate: number;
+  found: string[];
+  missing: string[];
+  all_compulsory_present: boolean;
+}
+
+export interface PipelineExecutionResponse {
+  success: boolean;
+  pipeline: string[];
+  total_duration_seconds: number;
+  final_content: string;
+  compulsory_keywords_audit?: CompulsoryKeywordsAudit;
+  checklist: {
+    sources_used: string[];
+    claims_verification: string;
+    schema_ready: boolean;
+    qa_passed: boolean;
+    suggested_next_step: string;
+  };
+  qa_scorecard?: {
+    overall_score: number;
+    scores?: Record<string, number>;
+    checks?: Record<string, any>;
+    highest_impact_fixes?: Array<{ original: string; suggested: string; reason: string }>;
+  };
+  fact_check_table?: Array<{
+    claim: string;
+    status: string;
+    source_name: string;
+    url: string;
+    year: string | number;
+    action_taken: string;
+  }>;
+  seo_package?: {
+    titles?: Array<{ title: string; character_count: number; recommended: boolean }>;
+    meta_descriptions?: Array<{ description: string; character_count: number; recommended: boolean }>;
+    slug?: string;
+    json_ld?: any;
+  };
+  step_results: Record<string, any>;
+  step_logs: PipelineExecutionLog[];
+  project_context: Record<string, any>;
+}
+
 

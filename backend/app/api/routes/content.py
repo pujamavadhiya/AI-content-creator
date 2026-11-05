@@ -7,11 +7,16 @@ from app.core.dependencies import get_current_user, require_role
 from app.schemas.content import (
     BlogGenerateRequest, SocialGenerateRequest, MultiPlatformGenerateRequest,
     RewriteRequest, ContentUpdate, ContentResponse, EvaluationResponse,
-    HumanToneAuditRequest, HumanToneAuditResponse, UrlRewriteRequest, UrlRewriteResponse
+    HumanToneAuditRequest, HumanToneAuditResponse, UrlRewriteRequest, UrlRewriteResponse,
+    ParaphraseHumanizeRequest, ParaphraseHumanizeResponse,
+    SanitizeSymbolsRequest, SanitizeSymbolsResponse,
+    ReplaceBannedWordsRequest, ReplaceBannedWordsResponse
 )
 from app.services.content_service import ContentService
 from app.services.quality_service import QualityService
 from app.services.export_service import ExportService
+from app.services.paraphrase_service import paraphrase_service
+from app.ai.skills.human_tone import sanitize_ai_symbols
 
 router = APIRouter(prefix="/api/content", tags=["Content Generation & Studio"])
 
@@ -57,6 +62,53 @@ async def audit_human_tone_endpoint(
 ):
     result = ContentService.audit_text(data.text)
     return HumanToneAuditResponse.model_validate(result)
+
+@router.post("/paraphrase-humanize", response_model=ParaphraseHumanizeResponse)
+async def paraphrase_humanize_endpoint(
+    data: ParaphraseHumanizeRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Anti-Plagiarism & Humanization Paraphraser:
+    Deeply restructures syntax, disrupts n-grams, strips all raw markdown table pipe grids (|---|),
+    and enforces high sentence burstiness with natural human rhythm.
+    """
+    result = await paraphrase_service.paraphrase_and_humanize(
+        text=data.text,
+        mode=data.mode,
+        target_tone=data.target_tone,
+        brand_id=data.brand_id,
+        org_id=current_user.organization_id if current_user else None,
+        provider_slug=data.provider,
+        compulsory_keywords=data.compulsory_keywords,
+        db=db
+    )
+    return ParaphraseHumanizeResponse.model_validate(result)
+
+@router.post("/sanitize-symbols", response_model=SanitizeSymbolsResponse)
+async def sanitize_symbols_endpoint(
+    data: SanitizeSymbolsRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Fast utility endpoint to instantly sanitize and convert raw Markdown table pipe grids (|---|)
+    into clean human-readable bullet points, removing AI synthetic detector footprints.
+    """
+    cleaned, count = sanitize_ai_symbols(data.text)
+    return SanitizeSymbolsResponse(cleaned_text=cleaned, symbols_cleaned=count)
+
+@router.post("/replace-banned-words", response_model=ReplaceBannedWordsResponse)
+async def replace_banned_words_endpoint(
+    data: ReplaceBannedWordsRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Instant 1-click replacement of all detected banned words and AI tells
+    with natural WordNet synonyms and conversational phrasing.
+    """
+    result = paraphrase_service.replace_banned_words(data.text, data.compulsory_keywords)
+    return ReplaceBannedWordsResponse.model_validate(result)
 
 @router.post("/url-rewrite", response_model=UrlRewriteResponse)
 async def rewrite_url_content_endpoint(

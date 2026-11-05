@@ -153,3 +153,4 @@ def generate_serp_gap_docx(data: Dict[str, Any]) -> io.BytesIO:
     doc.save(output_stream)
     output_stream.seek(0)
     return output_stream
+

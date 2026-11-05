@@ -14,6 +14,8 @@ class BlogGenerateRequest(BaseModel):
     desired_word_count: int = 1500
     seo_requirements: Optional[str] = None
     cta_style: Optional[str] = None
+    compulsory_keywords: Optional[str] = None  # Compulsory keywords (one per line or comma-separated)
+    mandatory_keywords: Optional[List[str]] = None
 
 class SocialGenerateRequest(BaseModel):
     brand_id: Optional[str] = None
@@ -51,9 +53,60 @@ class HumanToneAuditResponse(BaseModel):
     banned_words_found: List[str]
     banned_phrases_found: List[str]
     uncontracted_forms_found: List[str]
+    table_symbols_detected: bool = False
+    table_symbols_count: int = 0
+    burstiness_score: float = 8.5
+    burstiness_rating: str = "Good"
     cliche_opener_detected: bool
     summary_conclusion_detected: bool
     suggested_replacements: Dict[str, str]
+
+class ParaphraseHumanizeRequest(BaseModel):
+    text: str
+    mode: str = "anti_plagiarism"  # anti_plagiarism, humanize_burstiness, deep_rewrite, sanitize_symbols
+    target_tone: Optional[str] = None
+    brand_id: Optional[str] = None
+    provider: Optional[str] = None
+    compulsory_keywords: Optional[str] = None
+
+class ParaphraseHumanizeResponse(BaseModel):
+    success: bool
+    original_text: str
+    paraphrased_text: str
+    human_score: int
+    human_content_estimate: int = 90
+    passes_human_test: bool
+    burstiness_score: float
+    burstiness_rating: str
+    plagiarism_risk: str
+    table_symbols_cleaned: int
+    banned_words_removed: List[str] = []
+    wordnet_matches_count: Optional[int] = 0
+    paws_grounded: bool = True
+    wordnet_grounded: bool = True
+    local_model_matched: Optional[bool] = True
+    compulsory_keywords_audit: Optional[Dict[str, Any]] = None
+    audit: Dict[str, Any] = {}
+    duration_seconds: float
+    error: Optional[str] = None
+
+class SanitizeSymbolsRequest(BaseModel):
+    text: str
+
+class SanitizeSymbolsResponse(BaseModel):
+    cleaned_text: str
+    symbols_cleaned: int
+
+class ReplaceBannedWordsRequest(BaseModel):
+    text: str
+    compulsory_keywords: Optional[str] = None
+
+class ReplaceBannedWordsResponse(BaseModel):
+    cleaned_text: str
+    replaced_words: List[str]
+    total_replaced: int
+    audit: Dict[str, Any]
+    success: bool = True
 
 class UrlRewriteRequest(BaseModel):
     url: str

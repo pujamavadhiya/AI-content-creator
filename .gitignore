@@ -43,3 +43,8 @@ qdrant_storage/
 *.swp
 *.swo
 
+# Large LLM Datasets & Models
+LLM Model/
+LLM\ Model/
+
+

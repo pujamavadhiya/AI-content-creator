@@ -87,3 +87,4 @@ class SerpService:
     @staticmethod
     def export_docx(data: Dict[str, Any]):
         return generate_serp_gap_docx(data)
+

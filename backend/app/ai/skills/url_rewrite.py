@@ -41,7 +41,7 @@ Live Content Sample:
 1. AEO & SEARCH ENGINE STRUCTURE:
    - Provide a direct answer to search intent in the first 40 to 80 words.
    - Follow the existing page structure without breaking original logic, but rewrite each section completely with fresh, high-value depth.
-   - Include at least ONE comprehensive Markdown comparison table or data table to simplify complex points.
+   - Include a clear comparative trade-off breakdown formatted as clean bulleted takeaways (DO NOT use raw markdown pipe tables '|---|').
    - Include a proof section with concrete details and an honest note on limitations.
    - Include an FAQ section with 4-5 genuine user questions derived from search intent.
    - At the bottom, provide authoritative citations/sources.
@@ -62,13 +62,13 @@ Return ONLY a valid JSON object matching this schema:
     "identified_gaps": [
       "Missing direct answer in top 100 words for AI overviews",
       "Thin coverage on practical implementation factors",
-      "Lacks structured comparison table"
+      "Lacks structured comparative trade-off breakdown"
     ],
     "schema_status": "Outdated or incomplete schema"
   }},
   "whats_changing_and_why": [
     "Replacing vague introductory claims with an immediate, definitive answer for Google AI mode",
-    "Adding an actionable comparison table to qualify for featured snippets",
+    "Adding an actionable bulleted trade-off breakdown to qualify for featured snippets (no pipe tables)",
     "Incorporating real FAQ block addressing high-intent user objections",
     "Enforcing 100% human-tone voice without banned corporate vocabulary"
   ],
@@ -76,8 +76,8 @@ Return ONLY a valid JSON object matching this schema:
     "new_title_tag": "New High-CTR SEO Title",
     "new_meta_description": "New compelling 155-char meta description",
     "new_h1": "New Optimized H1 Heading",
-    "body_markdown": "# New H1 Heading\\n\\n[Full replacement body with H2/H3, tables, FAQs, and citations]...",
-    "comparison_table_markdown": "| Feature / Factor | Our Approach | Traditional Methods |\\n|---|---|---|\\n...",
+    "body_markdown": "# New H1 Heading\\n\\n[Full replacement body with H2/H3, bullet comparisons, FAQs, and citations]...",
+    "comparison_table_markdown": "• **Feature / Factor**: Our Approach vs Traditional Methods...",
     "faq_items": [
       {{"question": "How does this approach solve X?", "answer": "Direct, concrete answer..."}}
     ],
@@ -96,3 +96,4 @@ Return ONLY a valid JSON object matching this schema:
 }}
 Output ONLY valid JSON.
 """
+
