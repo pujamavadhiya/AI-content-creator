@@ -326,6 +326,7 @@ export default function AIModelsPage() {
               <option value="gemini">Google Gemini (Recommended)</option>
               <option value="openai">OpenAI</option>
               <option value="claude">Anthropic Claude</option>
+              <option value="serpapi">SerpApi (Google Trends & Live Search)</option>
             </select>
           </div>
 

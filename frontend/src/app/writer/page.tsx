@@ -18,6 +18,8 @@ function BlogWriterContent() {
   const searchParams = useSearchParams();
   const outlineIdParam = searchParams.get('outlineId');
   const contentIdParam = searchParams.get('id');
+  const topicParam = searchParams.get('topic') || searchParams.get('topic_title');
+  const keywordsParam = searchParams.get('keywords') || searchParams.get('compulsory_keywords');
 
   const { activeBrand, activeCollection, showToast } = useApp();
 
@@ -25,9 +27,9 @@ function BlogWriterContent() {
   const [contentId, setContentId] = useState<string | null>(contentIdParam);
 
   // Editor State
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState(topicParam || '');
   const [body, setBody] = useState('');
-  const [compulsoryKeywords, setCompulsoryKeywords] = useState('');
+  const [compulsoryKeywords, setCompulsoryKeywords] = useState(keywordsParam || '');
   const [wordCountTarget, setWordCountTarget] = useState<number>(1500);
   const [writingTone, setWritingTone] = useState('Thought leadership');
   const [contentFormat, setContentFormat] = useState<'draft' | 'blog' | 'article'>('draft');

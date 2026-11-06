@@ -459,4 +459,39 @@ export interface PipelineExecutionResponse {
   project_context: Record<string, any>;
 }
 
+export interface TrendingKeywordItem {
+  keyword: string;
+  type: 'rising' | 'top';
+  value: string;
+  extracted_value?: number | null;
+  growth_rate?: string | null;
+  search_intent: string;
+  category: string;
+}
+
+export interface TrendingTopicSuggestion {
+  title: string;
+  angle: string;
+  description: string;
+  target_audience: string;
+  content_format: string;
+  recommended_platform: string;
+  matched_keywords: string[];
+  why_trending: string;
+}
+
+export interface GoogleTrendsResponse {
+  topic: string;
+  geo: string;
+  date_range: string;
+  source: string;
+  rising_keywords: TrendingKeywordItem[];
+  top_keywords: TrendingKeywordItem[];
+  related_topics: { title: string; type?: string; growth?: string; is_rising?: boolean }[];
+  suggested_topics: TrendingTopicSuggestion[];
+  summary: string;
+  total_found: number;
+}
+
+
 

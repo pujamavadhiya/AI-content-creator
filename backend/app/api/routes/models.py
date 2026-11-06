@@ -13,6 +13,8 @@ from app.schemas.ai_config import (
 from app.core.dependencies import get_current_user, require_role
 from app.core.encryption import encrypt_credential, decrypt_credential
 from app.ai.providers.factory import get_ai_provider
+from app.services.trends_service import TrendsService
+import httpx
 from app.config import settings
 
 router = APIRouter(prefix="/api/ai", tags=["AI Model Management"])
@@ -49,6 +51,15 @@ async def list_providers(
             "default_model": settings.ANTHROPIC_MODEL or "claude-3-5-sonnet-20241022",
             "embedding_model": "text-embedding-004 (via Gemini)",
             "env_configured": bool(settings.ANTHROPIC_API_KEY)
+        },
+        {
+            "id": "prov_serpapi",
+            "name": "SerpApi (Google Trends & Live Search)",
+            "slug": "serpapi",
+            "is_active": True,
+            "default_model": "google_trends",
+            "embedding_model": "N/A (Trends Intelligence)",
+            "env_configured": bool(settings.SERPAPI_API_KEY)
         }
     ]
 
@@ -123,8 +134,23 @@ async def test_connection(
     db: AsyncSession = Depends(get_db)
 ):
     try:
-        provider = await get_ai_provider(provider_slug=data.provider_slug, org_id=current_user.organization_id, db=db)
-        test_res = await provider.test_connection()
+        if data.provider_slug == "serpapi":
+            key = await TrendsService.resolve_serpapi_key(None, current_user.organization_id, db)
+            if not key:
+                raise ValueError("No SerpApi API key found. Please save an API key or configure SERPAPI_API_KEY in .env.")
+            async with httpx.AsyncClient(timeout=8.0) as client:
+                res = await client.get("https://serpapi.com/account.json", params={"api_key": key})
+                if res.status_code == 200:
+                    acct = res.json()
+                    searches_left = acct.get("total_searches_left", "Active")
+                    test_res = {"message": f"SerpApi verified successfully. Searches remaining: {searches_left}", "model": "google_trends"}
+                elif res.status_code in [401, 403]:
+                    raise ValueError("Invalid SerpApi API key.")
+                else:
+                    test_res = {"message": f"SerpApi status {res.status_code} received.", "model": "google_trends"}
+        else:
+            provider = await get_ai_provider(provider_slug=data.provider_slug, org_id=current_user.organization_id, db=db)
+            test_res = await provider.test_connection()
 
         # Update last_tested_at in db if cred exists
         stmt = select(APICredential).where(

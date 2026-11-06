@@ -4,7 +4,8 @@ import {
   Topic, TopicCluster, ContentOutline, GeneratedContent,
   ContentEvaluation, CalendarEvent, AnalyticsSummary,
   AIProviderInfo, User, HumanToneAuditResult, MultiPlatformKeywordResult,
-  SerpGapResult, UrlRewriteResult, ParaphraseHumanizeResponse, ContentVersion
+  SerpGapResult, UrlRewriteResult, ParaphraseHumanizeResponse, ContentVersion,
+  GoogleTrendsResponse
 } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
@@ -151,6 +152,16 @@ export const apiClient = {
   getKeywords: async (brandId?: string): Promise<Keyword[]> => {
     const params = brandId ? { brand_id: brandId } : {};
     const res = await api.get('/api/research/keywords', { params });
+    return res.data;
+  },
+
+  searchGoogleTrends: async (payload: { topic: string; geo?: string; date?: string; serpapi_key?: string; brand_id?: string }): Promise<GoogleTrendsResponse> => {
+    const res = await api.post('/api/research/google-trends', payload);
+    return res.data;
+  },
+
+  saveTrendingKeywords: async (payload: { keywords: string[]; brand_id?: string; collection_id?: string; category?: string; search_intent?: string }): Promise<Keyword[]> => {
+    const res = await api.post('/api/research/google-trends/save', payload);
     return res.data;
   },
 

@@ -46,12 +46,15 @@ class Settings(BaseSettings):
     ANTHROPIC_API_KEY: Optional[str] = None
     ANTHROPIC_MODEL: str = "claude-3-5-sonnet-20241022"
     
+    # Search & SerpApi Google Trends
+    SERPAPI_API_KEY: Optional[str] = None
+    
     # File Storage
     UPLOAD_DIR: str = "./uploads"
     EXPORT_DIR: str = "./exports"
     MAX_UPLOAD_SIZE_MB: int = 25
 
-    @field_validator("GEMINI_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "QDRANT_API_KEY", mode="before")
+    @field_validator("GEMINI_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "QDRANT_API_KEY", "SERPAPI_API_KEY", mode="before")
     @classmethod
     def clean_empty_strings(cls, v):
         if isinstance(v, str):

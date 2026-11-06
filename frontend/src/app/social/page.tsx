@@ -36,7 +36,7 @@ const QUICK_INSTRUCTION_PILLS = [
 
 function SocialStudioContent() {
   const searchParams = useSearchParams();
-  const initialTopic = searchParams.get('topicTitle') || 'Why Reference-Driven AI Dominates Generic LLMs';
+  const initialTopic = searchParams.get('topicTitle') || searchParams.get('topic') || 'Why Reference-Driven AI Dominates Generic LLMs';
 
   const { activeBrand, activeCollection, showToast } = useApp();
 

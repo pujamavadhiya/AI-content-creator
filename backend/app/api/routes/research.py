@@ -10,12 +10,14 @@ from app.schemas.research import (
     MultiPlatformKeywordRequest, MultiPlatformKeywordResponse,
     SerpGapRequest, SerpGapResponse,
     TopicGenerateRequest, TopicResponse, TopicClusterResponse,
-    OutlineGenerateRequest, OutlineUpdateRequest, OutlineResponse
+    OutlineGenerateRequest, OutlineUpdateRequest, OutlineResponse,
+    GoogleTrendsRequest, GoogleTrendsResponse, SaveTrendingKeywordsRequest
 )
 from app.services.keyword_service import KeywordService
 from app.services.topic_service import TopicService
 from app.services.outline_service import OutlineService
 from app.services.serp_service import SerpService
+from app.services.trends_service import TrendsService
 
 router = APIRouter(prefix="/api/research", tags=["Research & Intelligence"])
 
@@ -46,6 +48,25 @@ async def generate_multi_platform_keywords_endpoint(
 ):
     result = await KeywordService.generate_multi_platform_keywords(data, current_user.organization_id, current_user.id, db)
     return MultiPlatformKeywordResponse.model_validate(result)
+
+# --- Google Trends & SerpApi Intelligence ---
+@router.post("/google-trends", response_model=GoogleTrendsResponse)
+async def search_google_trends_endpoint(
+    data: GoogleTrendsRequest,
+    current_user: User = Depends(require_role(["super_admin", "admin", "editor", "writer"])),
+    db: AsyncSession = Depends(get_db)
+):
+    result = await TrendsService.search_google_trends(data, current_user.organization_id, current_user.id, db)
+    return result
+
+@router.post("/google-trends/save", response_model=List[KeywordResponse])
+async def save_trending_keywords_endpoint(
+    data: SaveTrendingKeywordsRequest,
+    current_user: User = Depends(require_role(["super_admin", "admin", "editor", "writer"])),
+    db: AsyncSession = Depends(get_db)
+):
+    saved = await TrendsService.save_trending_keywords(data, current_user.organization_id, current_user.id, db)
+    return [KeywordResponse.model_validate(k) for k in saved]
 
 # --- SERP Gap Research ---
 @router.post("/serp-gap", response_model=SerpGapResponse)

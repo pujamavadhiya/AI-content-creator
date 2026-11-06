@@ -162,3 +162,49 @@ class OutlineResponse(BaseModel):
     class Config:
         from_attributes = True
 
+# --- Google Trends & SerpApi Schemas ---
+class GoogleTrendsRequest(BaseModel):
+    topic: str
+    geo: Optional[str] = "US"
+    date: Optional[str] = "today 12-m"
+    serpapi_key: Optional[str] = None
+    brand_id: Optional[str] = None
+
+class TrendingKeywordItem(BaseModel):
+    keyword: str
+    type: str = "rising"  # "rising" or "top"
+    value: str = ""       # e.g. "+350%", "Breakout", "100"
+    extracted_value: Optional[int] = None
+    growth_rate: Optional[str] = None
+    search_intent: str = "informational"
+    category: str = "breakout"
+
+class TrendingTopicSuggestion(BaseModel):
+    title: str
+    angle: str
+    description: str
+    target_audience: str
+    content_format: str = "Blog Post"
+    recommended_platform: str = "Blog"
+    matched_keywords: List[str] = []
+    why_trending: str
+
+class GoogleTrendsResponse(BaseModel):
+    topic: str
+    geo: str
+    date_range: str
+    source: str  # "serpapi_google_trends" or "trends_intelligence_engine"
+    rising_keywords: List[TrendingKeywordItem] = []
+    top_keywords: List[TrendingKeywordItem] = []
+    related_topics: List[Dict[str, Any]] = []
+    suggested_topics: List[TrendingTopicSuggestion] = []
+    summary: str = ""
+    total_found: int = 0
+
+class SaveTrendingKeywordsRequest(BaseModel):
+    keywords: List[str]
+    brand_id: Optional[str] = None
+    collection_id: Optional[str] = None
+    category: Optional[str] = "trending"
+    search_intent: Optional[str] = "informational"
+
